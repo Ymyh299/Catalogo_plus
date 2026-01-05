@@ -204,16 +204,42 @@
         }
 
         .refs-container ul {
+            width: 100%;
             margin: 10px;
             padding-left: 30px;
         }
 
+        .refs-container li::before {
+            content: "•";
+            font-size: 15px;
+            margin-right: 10px;
+        }
+
         .refs-container li {
+            display: flex;
             font-size: 15px;
             color: rgb(60, 60, 60);
             margin-bottom: 4px;
             font-family: 'Agenda';
+            list-style-position: inside; /* Mantém o bullet dentro */
         }
+
+        #delete-btn {
+            background-color: transparent;
+            color: rgb(60, 60, 60);
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            margin-left: auto;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: rgb(180, 70, 70);
+        }
+
 
         /* IMAGEM */
 
@@ -273,7 +299,9 @@
 
             <form action="" method="post" class="form-add">
                 <div class="input-ref">
-                    <input type="text" name="refs" id="refs" class="refs" placeholder="ex: A5000">
+                    <input type="text" name="refs" id="refs" class="refs" placeholder="ex: A5000" autocomplete="off"
+                        autocorrect="off" autocapitalize="off" spellcheck="false"
+                        oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div class="buttonadd">
                     <button type="submit">Adicionar</button>
@@ -299,7 +327,7 @@
             <div class="button-form">
                 <form action="/opcoes" method="post">
                     <button type="submit" class="continuar" onclick="carregarLista()">Continuar</button>
-                    <input type="hidden" id="referencias">
+                    <input type="hidden" id="referencias" name="referencias">
                 </form>
             </div>
 
@@ -388,29 +416,41 @@
 
         document.querySelector('.form-add').addEventListener('submit', function (e) {
             e.preventDefault();
-
             const ref = elementos.inputref.value.trim();
             if (!ref) return;
-
 
             if (elementos.refsContainer.style.display === 'none') {
                 elementos.refsContainer.style.display = 'block';
             }
 
-
             const li = document.createElement('li');
-            li.textContent = ref;
+
+            // Cria o span para o texto
+            const span = document.createElement('span');
+            span.textContent = ref;
+
+            // Cria o botão de excluir
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = '';
+            deleteBtn.id = 'delete-btn'
+            deleteBtn.className = 'fa-solid fa-trash';
+
+            // Adiciona evento para excluir a li
+            deleteBtn.addEventListener('click', function () {
+                li.remove();
+                // Verifica se a lista ficou vazia para esconder o container
+                if (elementos.refsList.children.length === 0) {
+                    elementos.refsContainer.style.display = 'none';
+                }
+            });
+
+            // Adiciona elementos na li
+            li.appendChild(span);
+            li.appendChild(deleteBtn);
+
             elementos.refsList.appendChild(li);
-
-
             elementos.inputref.value = '';
-
             carregarImagem(ref);
-        });
-
-
-        window.addEventListener('load', function () {
-            elementos.inputref.focus();
         });
 
     </script>

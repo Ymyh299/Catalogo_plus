@@ -155,11 +155,11 @@
     </style>
 </head>
 
-<body>
+<body>  
 
     <main>
         <header>
-            <a href="/opcoes" class="fa-solid fa-arrow-left"></a>
+            <a href="/opcoes" class="hidden" ></a>
             <p class="tit">Catálogo+</p>
             <a href="/" class="fa-regular fa-house"></a>
         </header>
@@ -172,17 +172,46 @@
             <div class="pdf-container">
                 <div class="header-pdf">
                     <span>PDF Ana Gonçalves</span>
-                    <button>Baixar</button>
+                    <button id="baixar" class="baixar">Baixar</button>
                 </div>
 
                 <div class="pdf-visualizer">
-                    <iframe src="/static/images/Ana Goncalves.pdf"></iframe>
+                    <iframe src="/resultado"></iframe>
                 </div>
             </div>
         </div>
 
     </main>
 
+    <script>
+
+        const baixar = document.getElementById('baixar')
+
+
+
+        baixar.addEventListener("click", async () => {
+            try {
+                const response = await fetch("/download");
+                if (!response.ok) throw new Error("Erro ao baixar PDF");
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = "/download";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                window.URL.revokeObjectURL(url);
+            } catch (err) {
+                statusDiv.innerHTML = "⚠️ Não foi possível baixar o PDF.";
+
+                statusDiv.style.color = "#ffb400";
+            }
+        });
+
+    </script>
 
 </body>
 

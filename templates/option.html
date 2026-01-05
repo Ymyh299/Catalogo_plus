@@ -744,7 +744,7 @@
                         </label>
 
                         <div id="conteudo-opc" class="hidden">
-                            <input id="input-capa" class="input-capa" type="text" placeholder="ex:A5001" disabled>
+                            <input id="input-capa" class="input-capa" type="text" placeholder="ex:A5001" disabled autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                         </div>
 
                         <label class="linha">
@@ -761,9 +761,9 @@
 
                         <div id="select-opcl" class="hidden">
                             <select id="select-logo" disabled>
-                                <option value="anag">Ana Gonçalves</option>
-                                <option value="coerenza">Coerenza</option>
-                                <option value="coerenzaplus">Coerenza+</option>
+                                <option value="logo_anag">Ana Gonçalves</option>
+                                <option value="logo_coerenza">Coerenza</option>
+                                <option value="logo_coerenzaplus">Coerenza+</option>
 
 
                             </select>
@@ -777,8 +777,8 @@
 
                         <div id="select-opcsl" class="hidden">
                             <select id="select-sublogo" disabled>
-                                <option value="golden">Golden</option>
-                                <option value="catarina">Catarina</option>
+                                <option value="sublogo_golden">Golden</option>
+                                <option value="sublogo_catarina">Catarina</option>
 
                             </select>
                         </div>
@@ -867,8 +867,8 @@
         <div class="popup-div">
             <h3>Nome do Arquivo</h3>
 
-            <form id="form-arquivo" action="/criarplanilha" method="post">
-                <input type="text" id="nome-arquivo" required>
+            <form id="form-arquivo" action="/gerar_planilha" method="post">
+                <input type="text" id="nome-arquivo" name="nome_arquivo" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 <input type="hidden" name="dados_json" id="dados-json">
 
                 <div class="buttons">
