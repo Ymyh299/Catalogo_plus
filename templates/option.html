@@ -966,7 +966,7 @@
 
         function atualizarlogo() {
             const logo = elementos.selectLogo.value.trim();
-            const logopath = `/static/logos/logo_${logo}.png`;
+            const logopath = `/static/logos/${logo}.png`;
 
             elementos.logodivs.forEach(logodiv => {
                 logodiv.style.backgroundImage = `url(${logopath})`;
@@ -975,7 +975,7 @@
 
         function atualizarSublogo() {
             const sublogo = elementos.selectSublogo.value.trim();
-            const sublogopath = `/static/logos/sublogo_${sublogo}.png`;
+            const sublogopath = `/static/logos/${sublogo}.png`;
 
             elementos.sublogodivs.forEach(sublogodiv => {
                 sublogodiv.style.backgroundImage = `url(${sublogopath})`;

@@ -181,15 +181,19 @@
             flex-direction: row;
             height: 60vh;
             width: 100%;
-
-
+            gap: 20px;
+            padding: 0 5%;
+            box-sizing: border-box;
+            
         }
 
         /* REFS CONTAINER */
 
         .refs-container {
             background-color: rgba(255, 255, 255, 0.2);
-            width: 30%;
+            flex: 0 1 30%;
+            min-width: 120px;
+            max-width: 25%;
             border: 2px solid rgb(60, 60, 60);
             border-radius: 10px;
             padding: 5px 8px 5px 0px;
@@ -197,10 +201,10 @@
             display: flex;
             align-items: baseline;
             justify-content: baseline;
-            margin-left: 5%;
             font-family: 'Agenda';
             scrollbar-width: thin;
             scrollbar-color: rgb(215, 215, 238) rgb(85, 85, 85);
+            box-sizing: border-box;
         }
 
         .refs-container ul {
@@ -212,7 +216,7 @@
         .refs-container li::before {
             content: "•";
             font-size: 15px;
-            margin-right: 10px;
+            margin-right: 4px;
         }
 
         .refs-container li {
@@ -221,7 +225,7 @@
             color: rgb(60, 60, 60);
             margin-bottom: 4px;
             font-family: 'Agenda';
-            list-style-position: inside; /* Mantém o bullet dentro */
+            list-style-position: inside;
         }
 
         #delete-btn {
@@ -248,17 +252,32 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100%;
+            aspect-ratio: 9 / 16;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .img {
+            width: auto;
             height: 100%;
-            display: block;
+            max-height: 100%;
             aspect-ratio: 9 / 16;
-            background-size: cover;
+            background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: transparent;
+            background-color: rgba(240, 240, 240, 0.3);
+            margin: auto;
+        }
+
+        /* Media query para telas menores */
+        @media (max-width: 460px) {
+
+            .visualizar {
+                width: 100%;
+                height: 95vw;
+            }
+
+
         }
 
 
