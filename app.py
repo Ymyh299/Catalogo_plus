@@ -8,16 +8,24 @@ import os
 import pandas as pd
 import time
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import requests
+import mysql.connector
+import os
 
 app = Flask(__name__)
-app.secret_key = "anag25000"
+app.secret_key = os.getenv('SECRET_KEY')
 
-DB_CONFIG = {
-    "host": "localhost",
-    "user": "root",
-    "password": "QualquerUma123",
-    "database": "catalogoplus"
+DB_CONFIG = { 
+    "host": os.getenv('DB_HOST'),
+    "user": os.getenv('DB_USER'),
+    "password": os.getenv('DB_PASS'),
+    "database": os.getenv('DB_NAME')
 }
+
+API_URL_BASE = os.getenv('API_URL_BASE')
+COMPANY_ID = os.getenv('COMPANY_ID')
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "indesign")
@@ -78,16 +86,15 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/logout")
+def logout():
+    session.pop("usuario", None)
+    return redirect(url_for("login"))
 
 @app.route("/")
 @login_required
 def index():
     return render_template("index.html", usuario=session["usuario"])
-
-# @app.route("/painel")
-# @login_required
-# def painel():
-#     return render_template("painel.html", usuario=session["usuario"])
 
 
 
@@ -126,11 +133,141 @@ def painel():
 @app.route("/opcoes", methods=["POST"])
 @login_required
 def opcoes():
-    session['referencias'] = request.form.get("referencias")
+    raw_referencias = request.form.get("referencias")
+    session['referencias'] = raw_referencias
+    
+
+    print(f"🔄 Iniciando atualização para: {raw_referencias}")
+    processar_lista_referencias(raw_referencias)
+    print("✅ Atualização concluída. Renderizando template.")
+
     return render_template("option.html")
 
 
+def obter_slug_por_code(code):
+    """
+    Consulta o banco de dados local para encontrar o slug a partir do code.
+    Retorna o slug (string) ou None se não encontrar.
+    """
+    slug = None
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        # Busca exata pelo code
+        cursor.execute("SELECT slug FROM products WHERE code = %s LIMIT 1", (code,))
+        resultado = cursor.fetchone()
+        if resultado:
+            slug = resultado[0]
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Erro ao buscar slug para o code '{code}': {e}")
+    
+    return slug
 
+def worker_atualizar_ref(code):
+    """
+    1. Pega o code.
+    2. Descobre o slug no banco.
+    3. Usa o slug na API Vesti para atualizar preço e composição.
+    """
+    # PASSO 1: Obter o Slug
+    slug_db = obter_slug_por_code(code)
+    
+    if not slug_db:
+        print(f"⏭️ Pular {code}: Slug não encontrado no banco de dados.")
+        return False
+
+    # PASSO 2: Consultar API usando o SLUG
+    # Note que trocamos {code} por {slug_db} na URL
+    url = (
+        f"https://apivesti.vesti.mobi/appmarca/v1/products/company/"
+        f"{COMPANY_ID}/product/{slug_db}/showcase?cid=7368dc35b43219a&reseller_id=null"
+    )
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json().get("product_group", {})
+
+        # Extração de dados (API Showcase retorna a estrutura dentro de 'product_group')
+        # Garantimos que estamos pegando os dados frescos da API
+        novo_price = data.get("price")
+        novo_promotional = data.get("promotion")
+        novo_price_promo = data.get("price_promotional")
+        nova_compo = data.get("composition")
+        product_id = data.get("id")
+        
+        # Tamanhos (opcional, mas bom manter atualizado)
+        sizes = data.get("sizes", [])
+        sizes_names = ",".join(s["name"] for s in sizes)
+
+        # PASSO 3: Atualizar no Banco
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+
+        # Update focado nas colunas pedidas, usando o CODE original como chave (ou o slug)
+        sql = """
+            UPDATE products 
+            SET 
+                price = %s,
+                promotional = %s,
+                price_promotional = %s,
+                composition = %s,
+                sizes = %s,
+                product_id = %s
+            WHERE code = %s
+        """
+        
+        vals = (
+            novo_price, 
+            novo_promotional, 
+            novo_price_promo, 
+            nova_compo, 
+            sizes_names,
+            product_id,
+            code
+        )
+
+        cursor.execute(sql, vals)
+        conn.commit()
+        
+        linhas_afetadas = cursor.rowcount
+        cursor.close()
+        conn.close()
+
+        if linhas_afetadas > 0:
+            print(f"✅ {code} (Slug: {slug_db}) atualizado com sucesso!")
+        else:
+            print(f"⚠️ {code} processado, mas banco não reportou mudanças (talvez dados iguais).")
+            
+        return True
+
+    except Exception as e:
+        print(f"❌ Erro ao atualizar {code} (via slug {slug_db}): {e}")
+        return False
+
+def processar_lista_referencias(referencias_str):
+    """
+    Recebe a string bruta do form (ex: 'A5000, B3000') e executa o update.
+    """
+    if not referencias_str:
+        return
+
+    # Limpeza da string: remove espaços e quebra por vírgula ou nova linha
+    lista_codes = [
+        code.strip() 
+        for code in referencias_str.replace('\n', ',').split(',') 
+        if code.strip()
+    ]
+
+    # Executa em paralelo para não travar a requisição por muito tempo
+    # Ajuste max_workers conforme a capacidade do seu servidor
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = [executor.submit(worker_atualizar_ref, code) for code in lista_codes]
+        # Espera todos terminarem antes de liberar a rota
+        for future in as_completed(futures):
+            future.result()
 
 
 def escolher_script(capa: bool, contracapa: bool) -> str:
@@ -156,7 +293,7 @@ app.DoScript "{jsx_path}", 1246973031
         with open(vbs_temp_path, "w", encoding="utf-8") as f:
             f.write(vbs_template)
 
-        resultado = subprocess.run(["wscript", vbs_temp_path], shell=False, capture_output=True, text=True, timeout=120)
+        resultado = subprocess.run(["wscript", vbs_temp_path], shell=False, capture_output=True, text=True, timeout=1800)
         if resultado.returncode == 0:
             print("InDesign executado com sucesso")
             return True
@@ -187,9 +324,6 @@ def gerar_planilha():
     # receber dados do form (JSON string)
     dados_json = request.form.get("dados_json")
 
-
-
-
     if not dados_json:
         return jsonify({"erro": "dados_json não enviado."}), 400
 
@@ -198,16 +332,12 @@ def gerar_planilha():
     except Exception as e:
         return jsonify({"erro": "dados_json inválido.", "detalhe": str(e)}), 400
 
-
     session["nome_arquivo_escolhido"] = dados_form.get("nomeArquivo", "arquivo")
-    # pegar referências da sessão
     referencias = session.get("referencias")
     if not referencias:
         return jsonify({"erro": "Nenhuma referência salva na sessão."}), 400
 
-    # aceitar string separada por vírgulas ou espaços, ou lista já serializada
     if isinstance(referencias, str):
-        # tenta detectar separador
         if "," in referencias:
             referencias = [r.strip() for r in referencias.split(",") if r.strip()]
         else:
@@ -215,34 +345,26 @@ def gerar_planilha():
     elif isinstance(referencias, list):
         pass
     else:
-        # se veio como JSON string dentro da session
         try:
             referencias = json.loads(referencias)
-            if not isinstance(referencias, list):
-                raise ValueError
+            if not isinstance(referencias, list): raise ValueError
         except Exception:
             return jsonify({"erro": "Formato de referências inválido."}), 400
 
-    # conectar DB
     conn = mysql.connector.connect(**DB_CONFIG)
     cursor = conn.cursor(buffered=True)
 
-
     query = """
-        SELECT name, price, promotional, price_promotional, composition
+        SELECT name, price, promotional, price_promotional, composition, sizes
         FROM products
         WHERE code = %s
     """
 
-    # listas / dicts para os 3 CSVs
     lista_produtos = []
-    linha_capa = None
-    linha_contracapa = None
-
-    # flags do formulário (usar .get com default False para evitar KeyError)
     want_referencia = bool(dados_form.get("referencia", False))
     want_preco = bool(dados_form.get("preco", False))
     want_composicao = bool(dados_form.get("composicao", False))
+    want_tamanho = bool(dados_form.get("tamanho", False))
     want_capa = bool(dados_form.get("capa", False))
     want_contracapa = bool(dados_form.get("contracapa", False))
     want_logo = bool(dados_form.get("logo", False))
@@ -254,47 +376,48 @@ def gerar_planilha():
     for ref in referencias:
         cursor.execute(query, (ref,))
         result = cursor.fetchone()
+        if not result: continue
 
-        if not result:
-            # se não achar no DB, pule
-            continue
+        name, price, promotional, price_promotional, composition, sizes_raw = result
 
-        name, price, promotional, price_promotional, composition = result
+        # --- LÓGICA DE TAMANHOS (VALORES DINÂMICOS) ---
+        tms = {f"{t}": "" for t in ["pp", "p", "m", "g", "gg", "u"]}
+        pre = {f"{t}": "" for t in ["pp", "p", "m", "g", "gg", "u"]}
+        
+        # --- LÓGICA DE CAMPOS FIXOS (COLUNAS K, L, M, P, S, V, Y, AB) ---
+        if want_tamanho:
+            texto_tamanho = "Tamanhos disponíveis:" # Coluna K
+            circulo = "O"                            # Coluna L
+            fixed_pp, fixed_p, fixed_m = "PP", "P", "M" # M, P, S
+            fixed_g, fixed_gg, fixed_u = "G", "GG", "U" # V, Y, AB
+            
+            if sizes_raw:
+                lista_tamanhos_db = [s.strip().upper() for s in sizes_raw.split(",")]
+                for tam in tms.keys():
+                    if tam.upper() in lista_tamanhos_db:
+                        tms[tam] = tam.upper()
+                        pre[tam] = "l"
+        else:
+            texto_tamanho = circulo = ""
+            fixed_pp = fixed_p = fixed_m = fixed_g = fixed_gg = fixed_u = ""
 
-        # preço
+        # Preço
         if want_preco:
             if promotional == 1:
-                de_ou_por = "DE:"
-                preco_original = price
-                traco = "\\"
-                real = "R$"
-                preco_promocional = price_promotional
-                por = "POR:"
-                realfixo = "R$"
+                de_ou_por, preco_original, traco, real, preco_promocional, por, realfixo = "DE:", price, "\\", "R$", price_promotional, "POR:", "R$"
             else:
-                de_ou_por = "POR:"
-                realfixo = ""
-                preco_original = price
-                traco = ""
-                real = ""
-                preco_promocional = ""
-                por = ""
+                de_ou_por, preco_original, traco, real, preco_promocional, por, realfixo = "POR:", price, "", "", "", "", ""
         else:
-            de_ou_por = ""
-            preco_original = ""
-            traco = ""
-            real = ""
-            preco_promocional = ""
-            por = ""
-            realfixo = "" 
+            de_ou_por = preco_original = traco = real = preco_promocional = por = realfixo = ""
 
-        # composição
-        comp = clean_composition(composition) if want_composicao else ""
+        # Composição com limite de caracteres
+        comp = ""
+        if want_composicao:
+            comp_bruta = clean_composition(composition)
+            comp = (comp_bruta[:28] + "+") if len(comp_bruta) > 28 else comp_bruta
 
-        # foto (sempre obrigatória conforme você disse)
         foto_path = rf"C:\Users\Administrador\Documents\fotosref\{ref}.jpg"
 
-        # monta linha produto (todas as colunas que pediu)
         linha_produto = {
             "referencia": ref if want_referencia else "",
             "nome": name if want_referencia else "",
@@ -306,26 +429,56 @@ def gerar_planilha():
             "realfixo": realfixo,
             "preco_promocional": preco_promocional,
             "composicao": comp,
-            "@fotos": foto_path
+            # Novos campos fixos
+            "texto_tamanho": texto_tamanho, # K
+            "circulo": circulo,             # L
+            "fixed_pp": fixed_pp,           # M
+            "tamanho PP": tms["pp"],        # N
+            "preenchimento PP": pre["pp"],  # O
+            "fixed_p": fixed_p,             # P
+            "tamanho P": tms["p"],          # Q
+            "preenchimento P": pre["p"],    # R
+            "fixed_m": fixed_m,             # S
+            "tamanho M": tms["m"],          # T
+            "preenchimento M": pre["m"],    # U
+            "fixed_g": fixed_g,             # V
+            "tamanho G": tms["g"],          # W
+            "preenchimento G": pre["g"],    # X
+            "fixed_gg": fixed_gg,           # Y
+            "tamanho GG": tms["gg"],        # Z
+            "preenchimento GG": pre["gg"],  # AA
+            "fixed_u": fixed_u,             # AB
+            "tamanho U": tms["u"],          # AC
+            "preenchimento U": pre["u"],    # AD
+            "@fotos": foto_path             # AE
         }
-
         lista_produtos.append(linha_produto)
 
     cursor.close()
     conn.close()
 
     if not lista_produtos:
-        return jsonify({"erro": "Nenhuma referência encontrada no banco."}), 404
+        return jsonify({"erro": "Nenhuma referência encontrada."}), 404
 
-    # montar CSV de produtos
     df_produtos = pd.DataFrame(lista_produtos)
-    # garantir ordem de colunas (opcional)
-    col_order = ["referencia", "nome", "de_ou_por", "preco_original", "traco", "por", "real", "realfixo", "preco_promocional", "composicao", "@fotos"]
+    
+    # Ordem exata das colunas para o Data Merge do InDesign
+    col_order = [
+        "referencia", "nome", "de_ou_por", "preco_original", "traco", "por", "real", "realfixo", "preco_promocional", "composicao",
+        "texto_tamanho", "circulo", 
+        "fixed_pp", "tamanho PP", "preenchimento PP",
+        "fixed_p", "tamanho P", "preenchimento P",
+        "fixed_m", "tamanho M", "preenchimento M",
+        "fixed_g", "tamanho G", "preenchimento G",
+        "fixed_gg", "tamanho GG", "preenchimento GG",
+        "fixed_u", "tamanho U", "preenchimento U",
+        "@fotos"
+    ]
+    
     df_produtos = df_produtos.reindex(columns=col_order)
     df_produtos.to_csv(CSV_PRODUTO_PATH, index=False, sep=";", encoding="utf-16")
 
-    # montar CSV de capa e contracapa (cada um tem apenas 1 linha com @fotofundo, @logo, @sublogo)
-    # Se houver capa ativa, monta com os valores vindos do form
+
     if want_capa:
         linha_capa = {
             "@fotofundo": rf"C:\Users\Administrador\Documents\fotosref\{referencia_capa_val}.jpg" if referencia_capa_val else "",
@@ -335,7 +488,6 @@ def gerar_planilha():
         df_capa = pd.DataFrame([linha_capa])
         df_capa.to_csv(CSV_CAPA_PATH, index=False, sep=",", encoding="utf-16")
     else:
-        # garante que arquivo anterior não atrapalhe
         if os.path.exists(CSV_CAPA_PATH):
             os.remove(CSV_CAPA_PATH)
 
@@ -371,7 +523,7 @@ def download_pdf():
     if not os.path.exists(PDF_PATH):
         return jsonify({"erro": "PDF não encontrado."}), 404
 
-    nome = session.get("nome_arquivo_escolhido", "arquivo_final")
+    nome = session.get("nome_arquivo_escolhido")
     # sanitize: opcionalmente remova espaços/char inválidos do nome
     nome = "".join(c for c in nome if c.isalnum() or c in (" ", "-", "_")).strip()
     if not nome:

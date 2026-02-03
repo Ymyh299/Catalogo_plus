@@ -11,8 +11,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* body e mais */
@@ -20,6 +20,9 @@
             margin: 0;
             box-sizing: border-box;
             padding: 0;
+            font-family: 'Agenda', sans-serif;
+            overflow: hidden;
+            height: 100vh;
         }
 
         p {
@@ -29,50 +32,34 @@
         @font-face {
             font-family: 'Chetta';
             src: url("../static/fonts/chettavissto/ChettaVissto.woff");
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'Agenda';
             src: url("../static/fonts/agenda/agenda-light.ttf");
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'Agenda Bold';
             src: url("../static/fonts/agenda/agenda-bold.ttf");
-            font-weight: normal;
-            font-style: normal;
         }
 
-        @font-face {
-            font-family: 'Agenda Light';
-            src: url("../static/fonts/agenda/agenda-light.ttf");
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        /*  MAIN  */
-
+        /* MAIN  */
         main {
             height: 100vh;
             background-image: url("../static/images/background.png");
             background-size: cover;
             background-position: center;
+            display: flex;
+            flex-direction: column;
         }
 
-
-
         /* HEADER */
-
         .tit {
             font-family: 'Chetta';
             font-size: 30px;
             margin: 0;
             color: rgb(60, 60, 60);
-            margin-top: 0px;
         }
 
         header {
@@ -80,479 +67,308 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 40px;
-            padding-top: 7px;
-            padding-bottom: 5px;
+            height: 55px;
+            padding: 0 20px;
+            box-sizing: border-box;
             border-bottom: 2px solid rgb(60, 60, 60);
             backdrop-filter: blur(6px);
             background-color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+            z-index: 10;
         }
 
         header a {
             text-decoration: none;
             color: rgb(60, 60, 60);
             font-size: 25px;
-            margin: 0px 10px 0px 10px;
         }
 
-
-        /* FIRST CONTAINER */
-
-        .first-container {
-            width: 100%;
+        /* CONTAINER GERAL */
+        .container {
             display: flex;
             flex-direction: row;
-            align-items: baseline;
-            justify-content: center;
-            margin-top: 2%;
-
-        }
-
-        /* FORM VISUALIZAR */
-
-        form {
-            margin-left: 2%;
-            margin-right: 1%;
-            display: flex;
-            width: 46%;
-            height: 100%;
-            justify-content: space-between;
-        }
-
-
-        /* OPCOES */
-
-        .opcoes-container {
+            height: calc(100vh - 55px);
             width: 100%;
+            overflow: hidden;
+        }
+
+        /* --- PRIMEIRO CONTAINER (OPÇÕES) --- */
+        .first-container {
+            width: 350px;
+            min-width: 300px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 5;
+            flex-shrink: 0;
         }
 
         .titopc {
-            font-family: 'Agenda Bold', 'Agenda';
+            font-family: 'Chetta';
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        .Produto,
+        .capa {
+            margin-bottom: 25px;
+        }
+
+        .Produto p,
+        .capa p {
+            font-family: 'Agenda Bold';
             font-size: 18px;
-            margin: 0;
+            margin-bottom: 10px;
+            color: #444;
         }
 
-        .opcoes {
-            margin-top: 2%;
-            margin-left: 5%;
-
-        }
-
-        .opcoes label {
-            margin-top: 2%;
-            margin-bottom: 3%;
-            font-size: 15px;
-        }
-
-        /* CHECKBOXS */
-
-
-        .hidden {
-            display: none;
-        }
-
-
-
+        /* Checkboxes */
         .linha {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 20px;
+            margin-bottom: 12px;
             cursor: pointer;
-            font-family: 'Agenda';
-            color: rgb(60, 60, 60);
+            font-size: 16px;
+            color: #333;
+            transition: color 0.2s;
         }
 
-        .opc {
+        .linha:hover {
+            color: #000;
+        }
+
+        .linha input {
             display: none;
         }
 
         .circle {
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgb(60, 60, 60);
+            width: 18px;
+            height: 18px;
+            border: 2px solid #555;
             border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            transition: all .2s ease;
-        }
-
-        .opc:checked+.circle {
-            background-color: rgb(60, 60, 60);
-            box-shadow: inset 0 0 0 2px rgb(248, 228, 228);
-        }
-
-
-        /* CAPA INPUT */
-        .input-capa {
-            font-size: 10px;
-            margin-top: 0px;
-            margin-bottom: 0px;
-            background-color: rgb(255, 255, 255);
-            margin-left: 20%;
-            border-radius: 8px;
-            width: 40%;
-            padding: 1%;
-            border: 1px solid rgb(60, 60, 60) !important;
-            color: rgb(60, 60, 60);
-        }
-
-        .input-capa:active {
-            outline: none !important;
-            box-shadow: none !important;
-        }
-
-        .input-capa:focus {
-            outline: none !important;
-            box-shadow: none !important;
-            border: 1px solid rgb(60, 60, 60) !important;
-        }
-
-        #conteudo-opc a {
-            font-size: 10px;
-        }
-
-
-        #conteudo-opc {
-            display: none;
-            flex-direction: column;
-            align-items: baseline;
-            gap: 5px;
-        }
-
-        #conteudo-opc input,
-        #conteudo-opc a {
-            opacity: 1;
-            transition: .2s ease;
-        }
-
-        #conteudo-opc.disabled input,
-        #conteudo-opc.disabled a {
-            opacity: 0.4;
-            pointer-events: none;
-        }
-
-
-
-        /* SELECT LOGO */
-        #select-opcl {
-            display: none;
-            flex-direction: column;
-        }
-
-        #select-logo {
-            font-size: 10px;
-            background-color: rgb(255, 255, 255);
-            margin-left: 10%;
-            border-radius: 8px;
-            width: 70%;
-            padding: 2%;
-            border: 1px solid rgb(60, 60, 60) !important;
-            color: rgb(60, 60, 60);
-        }
-
-        #select-logo:active {
-            border: 1px solid rgb(60, 60, 60) !important;
-            outline: none !important;
-            box-shadow: none !important;
-        }
-
-        #select-logo:focus {
-            outline: none !important;
-            box-shadow: none !important;
-            border: 1px solid rgb(60, 60, 60);
-        }
-
-        /* SELECT SUBLOGO */
-
-
-        #select-opcsl {
-            display: none;
-            flex-direction: column;
-        }
-
-        #select-sublogo {
-            font-size: 10px;
-            background-color: rgb(255, 255, 255);
-            margin-left: 10%;
-            border-radius: 8px;
-            width: 70%;
-            padding: 2%;
-            border: 1px solid rgb(60, 60, 60) !important;
-            color: rgb(60, 60, 60);
-        }
-
-        #select-sublogo:active {
-            border: 1px solid rgb(60, 60, 60) !important;
-            outline: none !important;
-            box-shadow: none !important;
-        }
-
-        #select-sublogo:focus {
-            outline: none !important;
-            box-shadow: none !important;
-            border: 1px solid rgb(60, 60, 60);
-        }
-
-
-        /* NOME DO ARQUIVO */
-        .name-container {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .name-container label {
-            font-family: 'Agenda';
-            font-size: 18px;
-            margin-top: 2%;
-        }
-
-        .name-container input {
-            border: 1px solid rgb(60, 60, 60);
-            border-radius: 8px;
-            padding: 2px;
-            padding-left: 8px;
-            margin-top: 2%;
-            font-family: 'Agenda';
-            font-size: 15px;
-
-        }
-
-        /* BUTTON CONTINUAR */
-        .button-container {
-            display: flex;
-        }
-
-        .button-container button {
-            font-size: 13px;
-            font-family: 'Agenda';
-            font-weight: 700;
-            color: white;
-            border: none;
-            background-color: rgba(40, 40, 40, 0.5);
-            width: 100%;
-            border-radius: 20px;
-            padding: 5px 20px 5px 20px;
-            margin-top: 5%;
-            margin-left: auto;
-        }
-
-
-
-
-        /* IMAGEM EXEMPLO */
-
-        .imgexemple-container {
+            margin-right: 10px;
             position: relative;
-            width: 46%;
-            margin-left: 1%;
-            margin-right: 2%;
-
-        }
-
-        .imgexemple {
-            background-image: url(/static/images/fotoexemplo.jpg);
-            width: 90%;
-            max-width: 100%;
-            aspect-ratio: 9 / 16;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-size: 2vw;
-            display: flex;
-            flex-direction: column;
-            align-items: baseline;
-            color: rgb(255, 255, 255);
-        }
-
-        .imgexemple-sup {
-            display: flex;
-            width: 100%;
-            flex-direction: column;
-        }
-
-        /* REFS */
-
-        .refsup {
-            margin: 2% 0px 0px 2%;
-            font-size: 2.5em;
-            font-family: 'Agenda';
-        }
-
-        .linharef {
-            background-color: rgb(255, 255, 255);
-            margin-left: 2%;
-            width: 15%;
-            height: 1px;
-
-        }
-
-        .nomeref {
-            margin: 0px 0px 0px 2%;
-            font-size: 1.2em;
-            font-family: 'Agenda';
-        }
-
-
-        /* PREÇO DE */
-        .preco {
-            display: flex;
-            flex-direction: column;
-
-        }
-
-        .dep {
-            padding: 0;
-            font-size: 1.8em;
-            font-family: 'Agenda';
-            margin: 1% 0px 0px 2%;
-        }
-
-        .de {
-            display: flex;
-            font-family: 'Agenda';
-            margin-left: 2%;
-        }
-
-        .cifrao {
-            font-size: 1.3em;
-            margin: 2% 0px 0px 0px;
-        }
-
-
-        .precode {
-            position: relative;
-            font-size: 2.5em;
             display: inline-block;
-            margin: 0;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
         }
 
-        .precode:after {
-            content: "";
+        .linha input:checked+.circle {
+            border-color: #000;
+        }
+
+        .linha input:checked+.circle::after {
+            content: '';
             position: absolute;
             top: 50%;
-            left: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: #000;
+            border-radius: 50%;
+        }
+
+        /* Inputs e Selects */
+        .input-capa,
+        select {
             width: 100%;
-            height: 0.1em;
-            background: rgb(255, 0, 0);
-            transform: rotate(-10deg);
-        }
-
-
-        /* PREÇO POR */
-
-        .porp {
-            font-size: 1.8em;
+            padding: 8px 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.9);
             font-family: 'Agenda';
-            margin: 0px 0px 0px 2%;
+            font-size: 14px;
+            box-sizing: border-box;
         }
 
-        .por {
-            display: flex;
-            font-family: 'Agenda';
-            margin-left: 2%;
-        }
-
-        .precodepromo {
-            position: relative;
-            font-size: 2.5em;
-            display: inline-block;
-            margin: 0;
-        }
-
-
-        /* COMPOSIÇÃO */
-
-        .imgexemple-inf {
-            margin-top: auto;
-            width: 100%;
-        }
-
-        .composicao {
-            margin: 0px 0px 2% 2%;
-            font-size: 0.8em;
-        }
-
-        .extit {
-            font-family: 'Agenda';
-        }
-
-
-        /* SECOND CONTAINER */
-
-        .second-container {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: baseline;
-            justify-content: center;
-            margin-top: 2%;
-            height: fit-content;
-        }
-
-        .imgcontracapa-container {
-            margin-left: 2%;
-            margin-right: 1%;
-            display: flex;
-            width: 46%;
-
-        }
-
-        .imgcapa-container {
-            display: flex;
-            width: 46%;
-            margin-left: 1%;
-            margin-right: 2%;
-        }
-
-
-        /* CAPA E CONTRACAPA */
-
-        .imgcapa {
-            width: 90%;
-            max-width: 350px;
-            aspect-ratio: 9 / 16;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-size: 1.5vw;
-            flex-direction: column;
-            align-items: baseline;
-            position: relative;
-            color: white;
-            display: block;
-            text-align: center;
-        }
-
-
-
-        .imgcontracapa {
-            width: 90%;
-            max-width: 350px;
-            aspect-ratio: 9 / 16;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-size: 1.5vw;
-            position: relative;
-            color: white;
-            display: block;
-            text-align: center;
-        }
-
-
-
-        .imgcapa::after,
-        .imgcontracapa::after {
-            display: none;
+        .input-capa:disabled,
+        select:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .hidden {
             display: none;
+        }
+
+        /* Botões */
+        .button-visualizar {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .button-48,
+        #btn-continuar {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Agenda Bold';
+            font-size: 16px;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+
+        .button-48 {
+            background-color: #fff;
+            border: 2px solid #333;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        #btn-continuar {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .button-48:hover,
+        #btn-continuar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Efeito de clique e feedback visual */
+        #btn-salvar {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #btn-salvar:active {
+            transform: scale(0.95);
+        }
+
+        /* Classe de animação de "Processando" */
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.8;
+            color: transparent !important;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 3px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+
+            to {
+                transform: rotate(1turn);
+            }
+        }
+
+        /* Container dos pontos */
+        .dots {
+            display: inline-flex;
+        }
+
+        /* Estilo individual de cada ponto */
+        .dots span {
+            animation: blink 1.4s infinite both;
+        }
+
+        /* Delay para criar o efeito de sequência (1º, 2º e 3º ponto) */
+        .dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* A animação propriamente dita */
+        @keyframes blink {
+            0% {
+                opacity: 0.2;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.2;
+            }
+        }
+
+        /* Estilo visual quando o botão está desabilitado (opcional) */
+        #btn-salvar:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- SEGUNDO CONTAINER (PREVIEW) --- */
+        .second-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            padding: 40px;
+            overflow-y: auto;
+            flex-wrap: wrap;
+            /* Importante para desktop */
+        }
+
+        .imgcapa-container,
+        .imgcontracapa-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Visual das "Folhas/Capas" */
+        .imgcapa,
+        .imgcontracapa {
+            width: 320px;
+            aspect-ratio: 9 / 16;
+            background-color: #fff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 2px;
+            transition: background-image 0.3s ease;
         }
 
         .overlay {
@@ -565,138 +381,330 @@
             z-index: 1;
         }
 
-        .imgcapa.tem-imagem .overlay,
-        .imgcontracapa.tem-imagem .overlay {
-            opacity: 1;
-        }
-
-
-
-        /* LOGO e SUBLOGO capa */
-        .imgcapa-container .logo {
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin: auto;
-            width: 80%;
-            height: 10%;
-            position: relative;
-            z-index: 2;
-            display: none;
-        }
-
-        .imgcapa-container .sublogo {
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            margin-top: auto;
-            width: 100%;
-            height: 10%;
+        .logo,
+        .sublogo {
             position: absolute;
-            bottom: 0;
-            margin-bottom: 5%;
-            z-index: 2;
-            display: none;
-
-        }
-
-        /* LOGO E SUBLOGO CONTRACAPA */
-
-        .imgcontracapa-container .logo {
             background-size: contain;
-            background-position: center;
             background-repeat: no-repeat;
-            width: 80%;
-            height: 10%;
-            position: relative;
-            top: 40%;
-            bottom: 40%;
+            background-position: center;
+            pointer-events: none;
             z-index: 2;
-            display: none;
-            margin-left: auto;
-            margin-right: auto;
+
         }
 
-        .imgcontracapa-container .sublogo {
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            width: 100%;
-            height: 10%;
-            position: relative;
-            top: 40%;
-            bottom: 40%;
-            z-index: 2;
-            display: none;
+        .logo {
+            width: 300px;
+            height: 60px;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
+        .sublogo {
+            width: 300px;
+            height: 100px;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
-
-
-
-        /* POPUP */
-
+        /* --- POPUP --- */
         #popup {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
             justify-content: center;
-            z-index: 3;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
         }
 
         .popup-div {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-radius: 25px;
-            width: fit-content;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 30px 15px 30px;
-            border: 1px solid #ccc;
-            z-index: 3;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
 
-        .popup-div h3 {
-            font-family: 'Agenda';
-            margin-bottom: 0;
-            margin-left: 10px;
-        }
-
-        #form-arquivo {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 3px;
-        }
-
-        .buttons button {
-            font-size: 13px;
-            font-family: 'Agenda';
-            font-weight: 700;
-            color: white;
-            border: none;
-            background-color: rgba(40, 40, 40, 0.5);
+        .popup-div input[type="text"] {
             width: 100%;
-            border-radius: 20px;
-            padding: 5px 20px 5px 20px;
-            margin-top: 5%;
-            margin-left: auto;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
 
-        input {
-            display: block;
-            margin: 10px 0;
+        .popup-div .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .popup-div button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+
+        .popup-div button[type="button"] {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .popup-div button[type="submit"] {
+            background-color: #333;
+            color: white;
+        }
+
+        /* --- RESPONSIVIDADE (MOBILE SPLIT SCREEN CORRIGIDO) --- */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: row;
+            }
+
+            .first-container {
+                width: 40%;
+                min-width: 0;
+                padding: 10px;
+            }
+
+            .second-container {
+                width: 50%;
+                flex: none;
+                padding: 15px 5px;
+                /* A CORREÇÃO MÁGICA ABAIXO: */
+                flex-direction: column;
+                /* Empilha verticalmente */
+                flex-wrap: nowrap;
+                /* PROIBE jogar para a direita (coluna invisível) */
+                align-items: center;
+                justify-content: flex-start;
+                gap: 20px;
+                display: flex;
+            }
+
+            .imgcapa-container,
+            .imgcontracapa-container {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+
+            .imgcapa,
+            .imgcontracapa {
+                width: 95%;
+                max-width: none;
+                aspect-ratio: 9 / 16;
+                height: auto;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Ajustes de Fonte */
+            .titopc {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .Produto p,
+            .capa p {
+                font-size: 18px;
+                margin-bottom: 5px;
+            }
+
+            .linha {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+
+            .circle {
+                width: 14px;
+                height: 14px;
+                margin-right: 5px;
+            }
+
+            .linha input:checked+.circle::after {
+                width: 6px;
+                height: 6px;
+            }
+
+            .input-capa,
+            select {
+                font-size: 12px;
+                padding: 5px;
+            }
+
+            .button-48,
+            #btn-continuar {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+
+
+            .logo {
+                width: 40%;
+                top: 8%;
+            }
+
+            .sublogo {
+                width: 35%;
+                bottom: 8%;
+            }
+        }
+
+        /* --- POPUP VISUALIZAR --- */
+        .popup-visualizar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-div-visualizar {
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Botão Fechar */
+        .close-visu {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgb(250, 237, 237);
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(60, 60, 60, 0.3);
+        }
+
+        /* CONTAINER DA IMAGEM (9:16) */
+        .imgexemple {
+            width: 320px;
+            /* Largura base */
+            aspect-ratio: 9 / 16;
+            /* Proporção Mágica */
+            background-image: url('/static/images/a5045.jpg');
+            background-size: cover;
+            background-position: center;
             border-radius: 8px;
-            padding: 5px;
-            width: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Parte Superior (Ref e Preço) */
+        .imgexemple-sup {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .ref-container {
+            height: 23px;
+            width: 72px;
+        }
+
+        /* Estilo Referência */
+        .referencia {
+            background-image: url('/static/images/ref.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            padding: 7px 2px;
+            height: 23px;
+            width: 72px;
+        }
+
+        .preco-container {
+            width: 86px;
+            height: 96px;
+        }
+
+        /* Estilo Preço */
+        .preco {
+            background-image: url('/static/images/preco.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            padding: 2px 2px;
+            height: 96px;
+            width: 86px;
+        }
+
+        /* Parte Inferior (Comp e Tamanhos) */
+        .-visu-footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: end;
+            gap: 1px;
+            width: 100%;
+        }
+
+        /* Estilo Composição */
+        .imgexemple-inf {
+            background-image: url('/static/images/comp.png');
+            background-repeat: no-repeat;
+            background-position: left;
+            background-size: contain;
+            margin-bottom: 2px;
+            height: 8px;
+            width: 161px;
+        }
+
+        .comp-container {
+            height: 8px;
+            width: 161px;
+        }
+
+        /* Estilo Tamanhos */
+        .tamanho-visu {
+            background-image: url('/static/images/tamanho.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            height: 30px;
+            width: 126px;
+        }
+
+        .tam-container {
+            height: 30px;
+            width: 126px;
+        }
+
+
+        /* Responsividade para telas muito pequenas */
+        @media (max-width: 360px) {
+            .imgexemple {
+                width: 85vw;
+                /* Se ajusta a tela */
+            }
         }
     </style>
 </head>
@@ -706,236 +714,215 @@
         <header>
             <a href="/painel" class="fa-solid fa-arrow-left"></a>
             <p class="tit">Catálogo+</p>
-            <a href="/" class="fa-regular fa-house"></a>
+            <a href="/" class="fa-solid fa-house"></a>
         </header>
 
-        <div class="first-container">
+        <div class="container">
+            <div class="first-container">
+                <form action="/criarplanilha" method="post">
+                    <div class="opcoes-container">
+                        <p class="titopc">Opcionais</p>
+                        <div class="opcoes">
+                            <div class="Produto">
+                                <p>Produto</p>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="referencia" id="iptreferencia">
+                                    <span class="circle"></span>
+                                    Referência
+                                </label>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="preco" id="iptpreco">
+                                    <span class="circle"></span>
+                                    Preço
+                                </label>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="composicao" id="iptcomposicao">
+                                    <span class="circle"></span>
+                                    Composição
+                                </label>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="tamanho" id="ipttamanho">
+                                    <span class="circle"></span>
+                                    Tamanho
+                                </label>
+                            </div>
 
+                            <div class="capa">
+                                <p>Capa</p>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="capa" id="check-opc">
+                                    <span class="circle"></span>
+                                    Capa
+                                </label>
+                                <div id="conteudo-opc" class="hidden">
+                                    <input id="input-capa" class="input-capa" type="text" placeholder="ex:A5001"
+                                        disabled autocomplete="off" autocorrect="off" autocapitalize="off"
+                                        spellcheck="false" style="text-transform: uppercase;"
+                                        oninput="this.value = this.value.toUpperCase()">
+                                </div>
 
-            <!-- LADO SUPERIOR ESQUERDO -->
-            <form action="/criarplanilha" method="post">
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="contracapa" id="iptcontracapa">
+                                    <span class="circle"></span>
+                                    Contra-capa
+                                </label>
 
-                <div class="opcoes-container">
-                    <p class="titopc">Opcionais</p>
-                    <div class="opcoes">
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="logo" id="check-logo">
+                                    <span class="circle"></span>
+                                    Logo
+                                </label>
+                                <div id="select-opcl" class="hidden">
+                                    <select id="select-logo" disabled>
+                                        <option value="logo_anag">Ana Gonçalves</option>
+                                        <option value="logo_coerenza">Coerenza</option>
+                                        <option value="logo_coerenzaplus">Coerenza+</option>
+                                    </select>
+                                </div>
 
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="referencia" id="iptreferencia">
-                            <span class="circle"></span>
-                            Referência
-                        </label>
-
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="preco" id="iptpreco">
-                            <span class="circle"></span>
-                            Preço
-                        </label>
-
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="composicao" id="iptcomposicao">
-                            <span class="circle"></span>
-                            Composição
-                        </label>
-
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="capa" id="check-opc">
-                            <span class="circle"></span>
-                            Capa
-                        </label>
-
-                        <div id="conteudo-opc" class="hidden">
-                            <input id="input-capa" class="input-capa" type="text" placeholder="ex:A5001" disabled autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        </div>
-
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="contracapa" id="iptcontracapa">
-                            <span class="circle"></span>
-                            Contra-capa
-                        </label>
-
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="logo" id="check-logo">
-                            <span class="circle"></span>
-                            Logo
-                        </label>
-
-                        <div id="select-opcl" class="hidden">
-                            <select id="select-logo" disabled>
-                                <option value="logo_anag">Ana Gonçalves</option>
-                                <option value="logo_coerenza">Coerenza</option>
-                                <option value="logo_coerenzaplus">Coerenza+</option>
-
-
-                            </select>
-                        </div>
-
-                        <label class="linha">
-                            <input type="checkbox" class="opc" value="logo" id="check-slogo">
-                            <span class="circle"></span>
-                            Sub-Logo
-                        </label>
-
-                        <div id="select-opcsl" class="hidden">
-                            <select id="select-sublogo" disabled>
-                                <option value="sublogo_golden">Golden</option>
-                                <option value="sublogo_catarina">Catarina</option>
-
-                            </select>
-                        </div>
-
-                    </div>
-
-
-                    <div class="button-container">
-                        <button type="submit" id="btn-continuar">Continuar</button>
-                    </div>
-                </div>
-            </form>
-
-
-
-            <!-- LADO SUPERIOR DIREITO -->
-            <div class="imgexemple-container">
-                <p class="extit">ex:</p>
-                <div class="imgexemple">
-                    <div class="imgexemple-sup">
-                        <div class="referencia" style="display: none;">
-                            <p class="refsup">V26022</p>
-                            <div class="linharef"></div>
-                            <p class="nomeref">Macacão V26022</p>
-                        </div>
-
-                        <div class="preco-container" style="display: none;">
-                            <div class="preco">
-                                <p class="dep">DE:</p>
-                                <div class="de">
-                                    <p class="cifrao">R$</p>
-                                    <p class="precode">139,90</p>
-                                    <!-- <p class="traco">/</p> -->
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="logo" id="check-slogo">
+                                    <span class="circle"></span>
+                                    Sub-Logo
+                                </label>
+                                <div id="select-opcsl" class="hidden">
+                                    <select id="select-sublogo" disabled>
+                                        <option value="sublogo_golden">Golden</option>
+                                        <option value="sublogo_catarina">Catarina</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div class="promo">
-                                <p class="porp">POR:</p>
-                                <div class="por">
-                                    <p class="cifrao">R$</p>
-                                    <p class="precodepromo">99,90</p>
-                                </div>
+                            <div class="button-visualizar">
+                                <button class="button-48" onclick="abrirVisualizar()" type="button">Visualizar
+                                    PDF</button>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="submit" id="btn-continuar">Continuar</button>
                             </div>
                         </div>
                     </div>
+                </form>
+            </div>
 
-                    <div class="imgexemple-inf" style="display: none;">
-                        <p class="composicao">96% POLIESTER 4% ELASTANO</p>
+            <div class="second-container">
+                <div class="imgcapa-container">
+                    <div class="imgcapa">
+                        <div class="overlay"></div>
+                        <div class="logo"></div>
+                        <div class="sublogo"></div>
                     </div>
-
                 </div>
-            </div>
 
-
-        </div>
-
-        <!-- SEGUNDO CONTAINER -->
-
-        <div class="second-container">
-
-
-            <!-- LADO INFERIOR ESQUERDO -->
-            <div class="imgcontracapa-container">
-                <div class="imgcontracapa">
-                    <div class="overlay"></div> <!-- Overlay separado -->
-                    <div class="logo"></div>
-                    <div class="sublogo"></div>
-                </div>
-            </div>
-
-
-            <!-- LADO INFERIOR DIREITO -->
-            <div class="imgcapa-container">
-                <div class="imgcapa">
-                    <div class="overlay"></div> <!-- Overlay separado -->
-                    <div class="logo"></div>
-                    <div class="sublogo"></div>
+                <div class="imgcontracapa-container">
+                    <div class="imgcontracapa">
+                        <div class="overlay"></div>
+                        <div class="logo"></div>
+                        <div class="sublogo"></div>
+                    </div>
                 </div>
             </div>
         </div>
-
-
-
     </main>
+
     <div id="popup" style="display: none;">
         <div class="popup-div">
             <h3>Nome do Arquivo</h3>
-
             <form id="form-arquivo" action="/gerar_planilha" method="post">
-                <input type="text" id="nome-arquivo" name="nome_arquivo" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <input type="text" id="nome-arquivo" name="nome_arquivo" required autocomplete="off" autocorrect="off"
+                    autocapitalize="off" spellcheck="false">
                 <input type="hidden" name="dados_json" id="dados-json">
-
                 <div class="buttons">
                     <button type="button" onclick="fecharPopup()">Cancelar</button>
-                    <button type="submit">Salvar</button>
+                    <button type="submit" id="btn-salvar">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="popup-visualizar" id="popup-visualizar" style="display: none;">
+        <div class="popup-div-visualizar">
+            <button type="button" class="close-visu" onclick="fecharPopupVisualizar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="imgexemple">
+                <div class="imgexemple-sup">
+                    <div class="ref-container">
+                        <div class="referencia" id="visu-ref" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="preco-container">
+                        <div class="preco" id="visu-preco" style="display: none;">
+                        </div>
+                    </div>
                 </div>
 
-            </form>
-
+                <div class="-visu-footer">
+                    <div class="comp-container">
+                        <div class="imgexemple-inf" id="visu-comp" style="display: none;">
+                        </div>
+                    </div>
+                    <div class="tam-container">
+                        <div class="tamanho-visu" id="visu-tam" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         // Variáveis globais
         const elementos = {
-            // Inputs e checkboxes
             checkCapa: document.getElementById("check-opc"),
             checkLogo: document.getElementById("check-logo"),
             checkSublogo: document.getElementById("check-slogo"),
             checkReferencia: document.getElementById("iptreferencia"),
             checkPreco: document.getElementById("iptpreco"),
             checkComposicao: document.getElementById("iptcomposicao"),
+            checkTamanho: document.getElementById("ipttamanho"),
             checkContracapa: document.getElementById("iptcontracapa"),
-
-            // Containers e inputs
             conteudoCapa: document.getElementById("conteudo-opc"),
             inputCapa: document.getElementById("input-capa"),
             selectLogo: document.getElementById("select-logo"),
             selectSublogo: document.getElementById("select-sublogo"),
             boxSelectLogo: document.getElementById("select-opcl"),
             boxSelectSublogo: document.getElementById("select-opcsl"),
-
-            // Divs de imagem
             capaDivs: [document.querySelector('.imgcapa'), document.querySelector('.imgcontracapa')],
             overlayDivs: document.querySelectorAll('.overlay'),
             logodivs: document.querySelectorAll('.logo'),
             sublogodivs: document.querySelectorAll('.sublogo'),
-
-
-            refdiv: document.querySelector('.referencia'),
-            precodiv: document.querySelector('.preco-container'),
-            compdiv: document.querySelector('.imgexemple-inf'),
-
-            // Popup
             popup: document.getElementById('popup'),
             formArquivo: document.getElementById('form-arquivo'),
-            inputNomeArquivo: document.getElementById('nome-arquivo')
+            inputNomeArquivo: document.getElementById('nome-arquivo'),
+            popupVisualizar: document.getElementById('popup-visualizar'),
+            visuRef: document.getElementById('visu-ref'),
+            visuPreco: document.getElementById('visu-preco'),
+            visuComp: document.getElementById('visu-comp'),
+            visuTam: document.getElementById('visu-tam'),
+            checkRefInput: document.getElementById('iptreferencia'),
+            checkPrecoInput: document.getElementById('iptpreco'),
+            checkCompInput: document.getElementById('iptcomposicao'),
+            checkTamInput: document.getElementById('ipttamanho')
         };
 
-        // Funções
-        let timeoutId; // Para debounce
+        let timeoutId;
 
         function carregarImagem(ref) {
             if (!ref || ref.length < 2) {
                 limparImagens();
                 return;
             }
-
             const imagePath = `/foto/${ref}`;
             const testImage = new Image();
 
             testImage.onload = function () {
-
                 elementos.capaDivs[0].style.backgroundImage = `url(${imagePath})`;
                 elementos.capaDivs[0].classList.add('tem-imagem');
                 elementos.overlayDivs[0].style.opacity = '1';
-
 
                 if (elementos.checkContracapa.checked) {
                     elementos.capaDivs[1].style.backgroundImage = `url(${imagePath})`;
@@ -943,12 +930,9 @@
                     elementos.overlayDivs[1].style.opacity = '1';
                 }
             };
-
             testImage.onerror = function () {
-                // Imagem não existe - limpar
                 limparImagens();
             };
-
             testImage.src = imagePath;
         }
 
@@ -956,7 +940,6 @@
             elementos.capaDivs[0].style.backgroundImage = '';
             elementos.capaDivs[0].classList.remove('tem-imagem');
             elementos.overlayDivs[0].style.opacity = '0';
-
             if (!elementos.checkContracapa.checked) {
                 elementos.capaDivs[1].style.backgroundImage = '';
                 elementos.capaDivs[1].classList.remove('tem-imagem');
@@ -967,7 +950,6 @@
         function atualizarlogo() {
             const logo = elementos.selectLogo.value.trim();
             const logopath = `/static/logos/${logo}.png`;
-
             elementos.logodivs.forEach(logodiv => {
                 logodiv.style.backgroundImage = `url(${logopath})`;
             });
@@ -976,48 +958,40 @@
         function atualizarSublogo() {
             const sublogo = elementos.selectSublogo.value.trim();
             const sublogopath = `/static/logos/${sublogo}.png`;
-
             elementos.sublogodivs.forEach(sublogodiv => {
                 sublogodiv.style.backgroundImage = `url(${sublogopath})`;
             });
         }
 
-        //CHECKBOX CAPA
+        // Eventos
         elementos.checkCapa.addEventListener('change', () => {
             if (elementos.checkCapa.checked) {
-
                 elementos.conteudoCapa.style.display = "flex";
                 elementos.inputCapa.disabled = false;
                 elementos.inputCapa.focus();
-
                 if (elementos.inputCapa.value.trim()) {
                     carregarImagem(elementos.inputCapa.value.trim());
                 }
             } else {
-
                 elementos.conteudoCapa.style.display = "none";
                 elementos.inputCapa.disabled = true;
                 limparImagens();
             }
         });
 
-        // BUSCA AUTOMÁTICA
         elementos.inputCapa.addEventListener('input', () => {
             clearTimeout(timeoutId);
-
             timeoutId = setTimeout(() => {
                 const ref = elementos.inputCapa.value.trim();
                 carregarImagem(ref);
             }, 500);
         });
 
-        //CHECKBOX LOGO
         elementos.checkLogo.addEventListener("change", () => {
             if (elementos.checkLogo.checked) {
                 atualizarlogo();
                 elementos.boxSelectLogo.style.display = "flex";
                 elementos.selectLogo.disabled = false;
-
                 elementos.logodivs.forEach(logo => {
                     logo.style.display = "block";
                 });
@@ -1025,7 +999,6 @@
                 elementos.logodivs.forEach(logo => {
                     logo.style.display = "none";
                 });
-
                 elementos.boxSelectLogo.style.display = "none";
                 elementos.selectLogo.disabled = true;
             }
@@ -1033,13 +1006,11 @@
 
         elementos.selectLogo.addEventListener("change", atualizarlogo);
 
-        //CHECKBOX SUBLOGO
         elementos.checkSublogo.addEventListener("change", () => {
             if (elementos.checkSublogo.checked) {
                 atualizarSublogo();
                 elementos.boxSelectSublogo.style.display = "flex";
                 elementos.selectSublogo.disabled = false;
-
                 elementos.sublogodivs.forEach(sublogo => {
                     sublogo.style.display = "block";
                 });
@@ -1047,7 +1018,6 @@
                 elementos.sublogodivs.forEach(sublogo => {
                     sublogo.style.display = "none";
                 });
-
                 elementos.boxSelectSublogo.style.display = "none";
                 elementos.selectSublogo.disabled = true;
             }
@@ -1055,10 +1025,8 @@
 
         elementos.selectSublogo.addEventListener("change", atualizarSublogo);
 
-        //CHECKBOX CONTRACAPA
         elementos.checkContracapa.addEventListener('change', () => {
             const ref = elementos.inputCapa.value.trim();
-
             if (elementos.checkContracapa.checked) {
                 if (!ref) {
                     alert("Digite uma referência em Capa primeiro");
@@ -1071,19 +1039,6 @@
                 elementos.capaDivs[1].classList.remove('tem-imagem');
                 elementos.overlayDivs[1].style.opacity = '0';
             }
-        });
-
-        //CHECKBOXES DO EXEMPLO
-        elementos.checkReferencia.addEventListener('change', () => {
-            elementos.refdiv.style.display = elementos.checkReferencia.checked ? "block" : "none";
-        });
-
-        elementos.checkPreco.addEventListener('change', () => {
-            elementos.precodiv.style.display = elementos.checkPreco.checked ? "block" : "none";
-        });
-
-        elementos.checkComposicao.addEventListener('change', () => {
-            elementos.compdiv.style.display = elementos.checkComposicao.checked ? "block" : "none";
         });
 
         // POPUP
@@ -1114,19 +1069,74 @@
             }
         });
 
+        function abrirVisualizar() {
+
+            if (elementos.checkRefInput.checked) {
+                elementos.visuRef.style.display = 'block';
+            } else {
+                elementos.visuRef.style.display = 'none';
+            }
+
+            // 2. Verifica Preço
+            if (elementos.checkPrecoInput.checked) {
+                elementos.visuPreco.style.display = 'block';
+            } else {
+                elementos.visuPreco.style.display = 'none';
+            }
+
+            // 3. Verifica Composição
+            if (elementos.checkCompInput.checked) {
+                elementos.visuComp.style.display = 'block';
+            } else {
+                elementos.visuComp.style.display = 'none';
+            }
+
+            // 4. Verifica Tamanho
+            if (elementos.checkTamInput.checked) {
+                elementos.visuTam.style.display = 'block';
+            } else {
+                elementos.visuTam.style.display = 'none';
+            }
+
+            // Mostra o Popup
+            elementos.popupVisualizar.style.display = 'flex';
+        }
+
+        function fecharPopupVisualizar() {
+            elementos.popupVisualizar.style.display = 'none';
+        }
+
+        // Fechar ao clicar fora da imagem
+        elementos.popupVisualizar.addEventListener('click', function (e) {
+            if (e.target === elementos.popupVisualizar) {
+                fecharPopupVisualizar();
+            }
+        });
+
+        // Tecla ESC para fechar
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && elementos.popupVisualizar.style.display === 'flex') {
+                fecharPopupVisualizar();
+            }
+        });
+
+
         elementos.formArquivo.addEventListener('submit', function (e) {
+
+            const btnSalvar = document.getElementById("btn-salvar");
+            btnSalvar.classList.add("btn-loading"); // Adiciona o spinner
 
             if (!elementos.inputNomeArquivo.value.trim()) {
                 alert('Digite um nome para o arquivo');
                 e.preventDefault();
                 return;
             }
-
             const dadosParaSalvar = {
                 nomeArquivo: elementos.inputNomeArquivo.value,
                 referencia: elementos.checkReferencia.checked,
                 preco: elementos.checkPreco.checked,
                 composicao: elementos.checkComposicao.checked,
+                tamanho: elementos.checkTamanho.checked,
                 capa: elementos.checkCapa.checked,
                 contracapa: elementos.checkContracapa.checked,
                 logo: elementos.checkLogo.checked,
@@ -1135,12 +1145,10 @@
                 logoescolhida: elementos.selectLogo.value,
                 sublogoescolhida: elementos.selectSublogo.value
             };
-
             document.getElementById("dados-json").value = JSON.stringify(dadosParaSalvar);
         });
 
         document.querySelector('#form-arquivo button[type="button"]').addEventListener('click', fecharPopup);
-
     </script>
 </body>
 

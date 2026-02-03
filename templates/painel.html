@@ -11,294 +11,427 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* body e mais */
+        /* --- ESTILOS GERAIS --- */
         body {
             margin: 0;
             box-sizing: border-box;
             padding: 0;
+            font-family: 'Agenda', sans-serif;
+            overflow: hidden;
+            /* Evita scroll na página principal, o scroll é interno */
+            height: 100vh;
+        }
+
+        p {
+            margin: 0;
         }
 
         @font-face {
             font-family: 'Chetta';
             src: url("../static/fonts/chettavissto/ChettaVissto.woff");
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'Agenda';
             src: url("../static/fonts/agenda/agenda-light.ttf");
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'Agenda Bold';
             src: url("../static/fonts/agenda/agenda-bold.ttf");
-            font-weight: normal;
-            font-style: normal;
         }
 
-        @font-face {
-            font-family: 'Agenda Light';
-            src: url("../static/fonts/agenda/agenda-light.ttf");
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        /*  MAIN  */
-
+        /* MAIN BACKGROUND */
         main {
             height: 100vh;
             background-image: url("../static/images/background.png");
             background-size: cover;
             background-position: center;
+            display: flex;
+            flex-direction: column;
         }
 
-
-
         /* HEADER */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 55px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            border-bottom: 2px solid rgb(60, 60, 60);
+            backdrop-filter: blur(6px);
+            background-color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+            z-index: 10;
+        }
 
         .tit {
             font-family: 'Chetta';
             font-size: 30px;
             margin: 0;
             color: rgb(60, 60, 60);
-            margin-top: 0px;
-        }
-
-        header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 40px;
-            padding-top: 7px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid rgb(60, 60, 60);
-            backdrop-filter: blur(6px);
-            background-color: rgba(255, 255, 255, 0.5);
         }
 
         header a {
             text-decoration: none;
             color: rgb(60, 60, 60);
             font-size: 25px;
-            margin: 0px 10px 0px 10px;
         }
 
+        /* --- LAYOUT GRID (SEMPRE LADO A LADO) --- */
+        .container {
+            display: flex;
+            flex-direction: row;
+            /* Força linha horizontal */
+            height: calc(100vh - 55px);
+            width: 100%;
+            overflow: hidden;
+        }
 
-        /* FIRST CONTAINER */
-
+        /* --- COLUNA DA ESQUERDA (CONTROLES) --- */
         .first-container {
+            width: 45%;
+            /* Um pouco menos da metade para dar ar */
+            min-width: 160px;
+            /* Garante um tamanho mínimo funcional */
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            width: 100%;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 5;
+            gap: 15px;
+            box-sizing: border-box;
         }
-
-        /* TITULO */
 
         .titulo p {
-            margin-left: 5%;
-            margin-top: 10px;
+            font-family: 'Chetta';
+            font-size: 24px;
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
             margin-bottom: 10px;
-            font-family: 'Agenda';
-            font-size: 25px;
-            color: rgb(60, 60, 60);
+            white-space: nowrap;
+            /* Evita quebra de linha feia no título */
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-
-        /* FORM ADD */
-
+        /* INPUT AREA */
         .form-add {
             display: flex;
-            width: 100%;
-        }
-
-        /* INPUT REF */
-
-        .input-ref {
-            display: flex;
             flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-ref input {
             width: 100%;
-
-        }
-
-        .refs {
-            margin-left: 8%;
-            font-size: 15px;
-            border-color: rgb(60, 60, 60);
-            border-width: 1px;
-            border-radius: 5px;
-            padding: 3px;
-            max-width: 50%;
+            padding: 10px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.9);
             font-family: 'Agenda';
-
-        }
-
-        .input-ref a {
-            margin-left: 8%;
-            font-family: 'Agenda';
-            font-size: 12px;
-        }
-
-        /* BUTTON ADD */
-        .buttonadd {
-            margin-right: 8%;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-transform: uppercase;
         }
 
         .buttonadd button {
-            font-size: 17px;
-            font-family: 'Agenda';
-            font-weight: 700;
-            color: white;
-            border: none;
-            background-color: rgba(40, 40, 40, 0.5);
             width: 100%;
-            border-radius: 20px;
-            padding: 3px 18px 3px 18px;
-            margin-right: 30%;
-        }
-
-
-        /* SECOND CONTAINER */
-
-        .second-container {
-            margin-top: 8%;
+            padding: 10px;
+            border: 2px solid #333;
+            background-color: #fff;
+            color: #333;
+            border-radius: 25px;
+            font-family: 'Agenda Bold';
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
-            flex-direction: column;
-            width: 100%;
+            justify-content: center;
             align-items: center;
+            gap: 5px;
         }
 
-        /* THIRD CONTAINER */
-        .third-container {
-            display: flex;
-            flex-direction: row;
-            height: 60vh;
-            width: 100%;
-            gap: 20px;
-            padding: 0 5%;
-            box-sizing: border-box;
-            
+        .buttonadd button:hover {
+            background-color: #333;
+            color: #fff;
         }
 
-        /* REFS CONTAINER */
-
+        /* LISTA DE REFERÊNCIAS */
         .refs-container {
-            background-color: rgba(255, 255, 255, 0.2);
-            flex: 0 1 30%;
-            min-width: 120px;
-            max-width: 25%;
-            border: 2px solid rgb(60, 60, 60);
-            border-radius: 10px;
-            padding: 5px 8px 5px 0px;
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 5px;
             overflow-y: auto;
-            display: flex;
-            align-items: baseline;
-            justify-content: baseline;
-            font-family: 'Agenda';
-            scrollbar-width: thin;
-            scrollbar-color: rgb(215, 215, 238) rgb(85, 85, 85);
-            box-sizing: border-box;
+            display: none;
         }
 
         .refs-container ul {
-            width: 100%;
-            margin: 10px;
-            padding-left: 30px;
-        }
-
-        .refs-container li::before {
-            content: "•";
-            font-size: 15px;
-            margin-right: 4px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
         .refs-container li {
             display: flex;
-            font-size: 15px;
-            color: rgb(60, 60, 60);
-            margin-bottom: 4px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
             font-family: 'Agenda';
-            list-style-position: inside;
+            font-size: 14px;
+            /* Fonte levemente menor para caber */
+            color: #333;
+            background-color: #fff;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .refs-container li span {
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         #delete-btn {
-            background-color: transparent;
-            color: rgb(60, 60, 60);
+            background: none;
             border: none;
-            font-size: 14px;
+            color: #999;
             cursor: pointer;
-            display: flex;
-            margin-left: auto;
-            flex-shrink: 0;
-            transition: background 0.2s;
+            font-size: 14px;
+            padding: 5px;
         }
 
-        .delete-btn:hover {
-            background: rgb(180, 70, 70);
+        #delete-btn:hover {
+            color: rgb(200, 50, 50);
         }
 
-
-        /* IMAGEM */
-
-        .visualizar {
-            width: 70%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            aspect-ratio: 9 / 16;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .img {
-            width: auto;
-            height: 100%;
-            max-height: 100%;
-            aspect-ratio: 9 / 16;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: rgba(240, 240, 240, 0.3);
-            margin: auto;
-        }
-
-        /* Media query para telas menores */
-        @media (max-width: 460px) {
-
-            .visualizar {
-                width: 100%;
-                height: 95vw;
-            }
-
-
-        }
-
-
-
-        /* BUTTON CONTINUAR */
-
+        /* BOTÃO CONTINUAR */
         .button-form {
-            margin-top: 10%;
+            margin-top: auto;
         }
 
         .continuar {
-            font-size: 20px;
-            font-family: 'Agenda';
-            font-weight: 700;
-            color: white;
-            border: none;
-            background-color: rgba(40, 40, 40, 0.5);
             width: 100%;
-            border-radius: 20px;
-            padding: 5px 20px 5px 20px;
-            margin-right: 30%;
+            padding: 12px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Agenda Bold';
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .continuar:hover {
+            transform: translateY(-1px);
+        }
+
+        /* --- COLUNA DA DIREITA (PREVIEW) --- */
+        .second-container {
+            flex: 1;
+            /* Ocupa o resto (55% aprox) */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: transparent;
+            overflow: hidden;
+            /* Garante que imagem grande não estoure */
+        }
+
+        .visualizar {
+            width: 100%;
+            max-width: 400px;
+            /* Limite para Desktop */
+            /* A mágica da proporção 9:16 */
+            aspect-ratio: 9 / 16;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Placeholder */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><text x="50%" y="50%" font-family="Arial" font-size="5" fill="%23ccc" text-anchor="middle">Preview</text></svg>');
+        }
+
+        .item-counter {
+            font-size: 10px;
+            /* Bem pequeno */
+            color: #888;
+            /* Cinza discreto */
+            font-family: sans-serif;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- RESPONSIVIDADE (AJUSTES FINOS PARA TELAS MENORES) --- */
+        @media (max-width: 768px) {
+            .container {
+                /* MANTÉM ROW, NÃO MUDA PARA COLUMN */
+                flex-direction: row;
+            }
+
+            .first-container {
+                width: 50%;
+                /* Metade exata no mobile */
+                padding: 10px;
+                /* Menos padding */
+                gap: 10px;
+            }
+
+            .titulo p {
+                font-size: 18px;
+                /* Título menor */
+            }
+
+            .input-ref input {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            .buttonadd button {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .second-container {
+                padding: 10px;
+                /* Menos espaço em volta da imagem */
+            }
+
+            .continuar {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+
+        /* Telas MUITO pequenas (ex: iPhone SE antigo) */
+        @media (max-width: 380px) {
+            .first-container {
+                width: 55%;
+                /* Dá um pouco mais de espaço para o texto */
+            }
+
+            .tit {
+                font-size: 24px;
+            }
+        }
+
+
+
+        /* --- POPUP DE SINCRONIZAÇÃO (MODERNO) --- */
+        .popup-sync {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Fundo um pouco mais escuro para destacar o modal branco */
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            /* Controlado pelo JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            /* Blur no fundo para focar a atenção */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            /* Para animação de entrada (opcional) */
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .sync-div {
+            display: flex;
+            flex-direction: row;
+            /* Ícone ao lado do texto */
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+
+            /* Visual Premium Branco/Glass */
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 1);
+
+            padding: 25px 40px;
+            border-radius: 15px;
+
+            /* Sombra suave e elegante */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+            width: auto;
+            /* Ajusta ao conteúdo */
+            min-width: 250px;
+            max-width: 90%;
+        }
+
+        /* Tipografia do Título h2 dentro da div */
+        .sync-div h2 {
+            font-family: 'Agenda Bold', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+            /* Remove margens padrão que atrapalham o layout */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Estilo do Ícone (Container) */
+        .spin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            /* Tamanho do ícone */
+            color: #333;
+            /* Cor do ícone */
+        }
+
+        /* Responsividade */
+        @media (max-width: 400px) {
+            .sync-div {
+                padding: 20px 30px;
+                gap: 15px;
+                min-width: 200px;
+            }
+
+            .sync-div h2 {
+                font-size: 16px;
+            }
+
+            .spin {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -308,174 +441,171 @@
         <header>
             <a href="/" class="fa-solid fa-arrow-left"></a>
             <p class="tit">Catálogo+</p>
-            <a href="/" class="fa-regular fa-house"></a>
+            <a href="/" class="fa-solid fa-house"></a>
         </header>
 
-        <div class="first-container">
-            <div class="titulo">
-                <p>Insira as referências</p>
-            </div>
+        <div class="container">
 
-            <form action="" method="post" class="form-add">
-                <div class="input-ref">
-                    <input type="text" name="refs" id="refs" class="refs" placeholder="ex: A5000" autocomplete="off"
-                        autocorrect="off" autocapitalize="off" spellcheck="false"
-                        oninput="this.value = this.value.toUpperCase()">
-                </div>
-                <div class="buttonadd">
-                    <button type="submit">Adicionar</button>
-                </div>
-            </form>
-
-        </div>
-
-        <div class="second-container">
-            <div class="third-container">
-                <div class="refs-container">
-                    <ul>
-
-                    </ul>
+            <div class="first-container">
+                <div class="titulo">
+                    <p>Inserir Referências</p>
                 </div>
 
-                <div class="visualizar">
-                    <div class="img">
+                <form action="" method="post" class="form-add">
+                    <div class="input-ref">
+                        <input type="text" name="refs" id="refs" class="refs" placeholder="Cód. (ex: A5000)"
+                            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                            oninput="this.value = this.value.toUpperCase()">
                     </div>
+                    <div class="buttonadd">
+                        <button type="submit">Adicionar <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </form>
+
+                <div class="refs-container">
+                    <div class="item-counter">Itens: <span id="count-number">0</span></div>
+                    <ul></ul>
+                </div>
+
+                <div class="button-form">
+                    <form action="/opcoes" method="post" id="form">
+                        <button type="submit" class="continuar" onclick="carregarLista()">Continuar</button>
+                        <input type="hidden" id="referencias" name="referencias">
+                    </form>
                 </div>
             </div>
 
-            <div class="button-form">
-                <form action="/opcoes" method="post">
-                    <button type="submit" class="continuar" onclick="carregarLista()">Continuar</button>
-                    <input type="hidden" id="referencias" name="referencias">
-                </form>
+            <div class="second-container">
+                <div class="visualizar">
+                    <div class="img"></div>
+                </div>
             </div>
 
-
-
         </div>
 
-
-        </div>
 
     </main>
+
+    <div class="popup-sync" id="popup-sync" style="display: none;">
+        <div class="sync-div">
+            <h2>Sincronizando</h2>
+            <div class="spin">
+                <i class="fa-solid fa-arrows-rotate fa-spin"></i>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Variáveis globais
         const elementos = {
             imgdiv: document.querySelector('.img'),
             inputref: document.getElementById("refs"),
             refsContainer: document.querySelector('.refs-container'),
             refsList: document.querySelector('.refs-container ul'),
             iptrefs: document.getElementById('referencias'),
+            contador: document.getElementById('count-number'),
+            popupSync: document.getElementById('popup-sync'),
+            form: document.getElementById('form')
         };
 
         let timeoutId;
 
-
         function carregarLista() {
-            const lis = document.querySelectorAll('ul li'); // pega todos os li dentro da ul
+            const lis = document.querySelectorAll('ul li span');
             const valores = [];
-
-            lis.forEach(li => {
-                valores.push(li.innerText.trim()); // pega o texto de cada li
-            });
-
-            elementos.iptrefs.value = valores.join(','); // salva no input como texto
-
-            console.log("Lista enviada:", elementos.iptrefs.value);
+            lis.forEach(span => valores.push(span.innerText.trim()));
+            elementos.iptrefs.value = valores.join(',');
         }
-
-
 
         function carregarImagem(ref) {
             if (!ref || ref.length < 2) {
                 limparImagens();
                 return;
             }
-
             const imagePath = `/foto/${ref}`;
             const testImage = new Image();
-
             testImage.onload = function () {
-
                 elementos.imgdiv.style.backgroundImage = `url(${imagePath})`;
-                elementos.imgdiv.style.backgroundSize = 'cover';
-                elementos.imgdiv.style.backgroundPosition = 'center';
-                elementos.imgdiv.style.backgroundRepeat = 'no-repeat';
-
-                // FORÇA manter o aspect-ratio 9:16 independente da imagem
-                elementos.imgdiv.style.aspectRatio = '9 / 16';
-
-                // Adiciona cor de fundo se quiser ver melhor
-                elementos.imgdiv.style.backgroundColor = 'rgba(240, 240, 240, 0.3)';
             };
-
             testImage.onerror = function () {
                 limparImagens();
             };
-
             testImage.src = imagePath;
         }
 
         function limparImagens() {
             elementos.imgdiv.style.backgroundImage = '';
-            elementos.imgdiv.style.backgroundColor = 'transparent';
-            elementos.imgdiv.style.aspectRatio = '9 / 16'; // Mantém a proporção
         }
 
-
+        // Listener de input: tenta carregar a imagem da última referência que está sendo digitada
         elementos.inputref.addEventListener('input', () => {
             clearTimeout(timeoutId);
-
             timeoutId = setTimeout(() => {
-                const ref = elementos.inputref.value.trim();
-                carregarImagem(ref);
+                const valor = elementos.inputref.value.trim();
+                // Pega apenas a última parte após o espaço ou vírgula para o preview
+                const partes = valor.split(/[,\s]+/);
+                const ultimaRef = partes[partes.length - 1];
+                carregarImagem(ultimaRef);
             }, 500);
         });
 
-
         document.querySelector('.form-add').addEventListener('submit', function (e) {
             e.preventDefault();
-            const ref = elementos.inputref.value.trim();
-            if (!ref) return;
+            const rawValue = elementos.inputref.value.trim();
+            if (!rawValue) return;
 
-            if (elementos.refsContainer.style.display === 'none') {
-                elementos.refsContainer.style.display = 'block';
-            }
+            // Divide a string por vírgula OU espaço (um ou mais) e remove itens vazios
+            const refsArray = rawValue.split(/[,\s]+/).filter(ref => ref.length > 0);
 
-            const li = document.createElement('li');
+            refsArray.forEach(ref => {
+                const refUpper = ref.toUpperCase();
 
-            // Cria o span para o texto
-            const span = document.createElement('span');
-            span.textContent = ref;
-
-            // Cria o botão de excluir
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = '';
-            deleteBtn.id = 'delete-btn'
-            deleteBtn.className = 'fa-solid fa-trash';
-
-            // Adiciona evento para excluir a li
-            deleteBtn.addEventListener('click', function () {
-                li.remove();
-                // Verifica se a lista ficou vazia para esconder o container
-                if (elementos.refsList.children.length === 0) {
-                    elementos.refsContainer.style.display = 'none';
+                if (elementos.refsContainer.style.display === 'none' || elementos.refsContainer.style.display === '') {
+                    elementos.refsContainer.style.display = 'block';
                 }
+
+                const li = document.createElement('li');
+                const span = document.createElement('span');
+                span.textContent = refUpper;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.id = 'delete-btn';
+                deleteBtn.className = 'fa-solid fa-trash';
+
+                deleteBtn.addEventListener('click', function () {
+                    li.remove();
+                    atualizarContador();
+                    if (elementos.refsList.children.length === 0) {
+                        elementos.refsContainer.style.display = 'none';
+                        limparImagens();
+                    }
+                });
+
+                li.appendChild(span);
+                li.appendChild(deleteBtn);
+                elementos.refsList.appendChild(li);
+
+                // Exibe a imagem da última referência adicionada do grupo
+                carregarImagem(refUpper);
             });
 
-            // Adiciona elementos na li
-            li.appendChild(span);
-            li.appendChild(deleteBtn);
-
-            elementos.refsList.appendChild(li);
+            atualizarContador();
             elementos.inputref.value = '';
-            carregarImagem(ref);
+            elementos.inputref.focus();
         });
 
+        function atualizarContador() {
+            if (elementos.contador && elementos.refsList) {
+                // Conta quantos <li> existem dentro da <ul>
+                elementos.contador.innerText = elementos.refsList.children.length;
+            }
+        }
+
+        elementos.form.addEventListener('submit', function () {
+            elementos.popupSync.style.display = 'flex';
+        });
+
+
     </script>
-
-
-
 </body>
 
 </html>

@@ -10,169 +10,241 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* body e mais */
+        /* RESET E FONTES */
         body {
             margin: 0;
-            box-sizing: border-box;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Agenda', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            background-color: #f0f0f0;
+            /* Fallback */
         }
 
         @font-face {
             font-family: 'Chetta';
             src: url("../static/fonts/chettavissto/ChettaVissto.woff");
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'Agenda';
             src: url("../static/fonts/agenda/agenda-light.ttf");
-            font-weight: normal;
-            font-style: normal;
         }
 
         @font-face {
             font-family: 'Agenda Bold';
             src: url("../static/fonts/agenda/agenda-bold.ttf");
-            font-weight: normal;
-            font-style: normal;
         }
 
-        @font-face {
-            font-family: 'Agenda Light';
-            src: url("../static/fonts/agenda/agenda-light.ttf");
-            font-weight: normal;
-            font-style: normal;
-        }
-
-        /*  MAIN  */
-
+        /* LAYOUT PRINCIPAL */
         main {
             height: 100vh;
             background-image: url("../static/images/background.png");
             background-size: cover;
             background-position: center;
+            display: flex;
+            flex-direction: column;
         }
 
-
-
         /* HEADER */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 55px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            border-bottom: 2px solid rgb(60, 60, 60);
+            backdrop-filter: blur(6px);
+            background-color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+            z-index: 10;
+        }
 
         .tit {
             font-family: 'Chetta';
             font-size: 30px;
             margin: 0;
             color: rgb(60, 60, 60);
-            margin-top: 0px;
-        }
-
-        header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 40px;
-            padding-top: 7px;
-            padding-bottom: 5px;
-            border-bottom: 2px solid rgb(60, 60, 60);
-            backdrop-filter: blur(6px);
-            background-color: rgba(255, 255, 255, 0.5);
         }
 
         header a {
             text-decoration: none;
             color: rgb(60, 60, 60);
             font-size: 25px;
-            margin: 0px 10px 0px 10px;
         }
 
-        /* CONTAINER */
-
+        /* CONTAINER DE CONTEÚDO */
         .container {
-            align-items: center;
+            flex: 1;
+            /* Ocupa o resto da tela */
             display: flex;
             flex-direction: column;
-            height: 60%;
+            align-items: center;
+            justify-content: flex-start;
+            /* Começa do topo, não do meio */
+            padding-top: 15px;
+            /* Espaço pequeno do topo */
+            width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            /* Permite scroll se a tela for muito pequena na altura */
+        }
+
+        .titulo {
+            margin-bottom: 10px;
+            /* Reduzi a margem */
+            text-align: center;
         }
 
         .titulo p {
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin: 0;
             font-family: 'Agenda Bold';
-            font-size: 20px;
+            font-size: 22px;
             color: rgb(60, 60, 60);
         }
 
-
-        /* PDF CONTAINER */
-
+        /* CONTAINER DO VISUALIZADOR */
+        /* Aqui está a mágica da proporção e do "não-quadradão" */
         .pdf-container {
-            width: 70%;
+            /* Define a altura baseada na tela para garantir que caiba */
+            height: 75vh;
+            max-height: 800px;
+            /* Limite para telas gigantes */
+
+            /* A largura é calculada AUTOMATICAMENTE pela proporção */
+            aspect-ratio: 9 / 16;
+            width: auto;
+
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            border: solid rgb(60, 60, 60) 1px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 20px;
+            /* Mais arredondado */
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-sizing: border-box;
+            margin-bottom: 20px;
         }
 
-        /* HEADER PDF */
-
+        /* HEADER INTERNO (PDF + BOTÃO) */
         .header-pdf {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 3%;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            /* Não deixa encolher */
         }
 
         .header-pdf span {
-            font-family: 'Agenda';
+            font-family: 'Agenda Bold';
+            font-size: 14px;
+            color: #333;
         }
 
         .header-pdf button {
             border: none;
-            background-color: transparent;
-            color: blue;
-            text-decoration: underline;
+            background-color: #333;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
             cursor: pointer;
+            font-family: 'Agenda';
+            font-size: 12px;
+            transition: transform 0.1s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        
-        /* PDF */
 
+        .header-pdf button:hover {
+            background-color: #000;
+            transform: translateY(-1px);
+        }
+
+        /* ÁREA DO IFRAME */
         .pdf-visualizer {
-            height: 100%;
-            display: block;
-            aspect-ratio: 9 / 16;
+            flex: 1;
+            /* Ocupa todo o espaço restante do container */
+            width: 100%;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
         }
 
         iframe {
-            height: 100%;
             width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .container {
+                padding-top: 10px;
+            }
+
+            .pdf-container {
+                /* No celular, aumentamos um pouco a altura relativa */
+                height: 78vh;
+                padding: 12px;
+            }
+
+            .titulo p {
+                font-size: 18px;
+            }
+        }
+
+        /* Ajuste para telas muito baixas (Landscape) */
+        @media (max-height: 600px) {
+            .pdf-container {
+                height: 70vh;
+            }
+
+            header {
+                height: 45px;
+            }
+
+            .tit {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 
-<body>  
+<body>
 
     <main>
         <header>
-            <a href="/opcoes" class="hidden" ></a>
+            <a href="/opcoes" class="fa-solid fa-arrow-left"></a>
             <p class="tit">Catálogo+</p>
-            <a href="/" class="fa-regular fa-house"></a>
+            <a href="/" class="fa-solid fa-house"></a>
         </header>
 
         <div class="container">
             <div class="titulo">
-                <p>Visualizar</p>
+                <p>Visualizar Resultado</p>
             </div>
 
             <div class="pdf-container">
                 <div class="header-pdf">
-                    <span>PDF Ana Gonçalves</span>
-                    <button id="baixar" class="baixar">Baixar</button>
+                    <span>PDF Gerado</span>
+                    <button id="baixar" class="baixar">
+                        <i class="fa-solid fa-download"></i> Baixar
+                    </button>
                 </div>
 
                 <div class="pdf-visualizer">
@@ -187,30 +259,28 @@
 
         const baixar = document.getElementById('baixar')
 
-
-
         baixar.addEventListener("click", async () => {
+
             try {
                 const response = await fetch("/download");
                 if (!response.ok) throw new Error("Erro ao baixar PDF");
-
+                
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
-
                 const a = document.createElement("a");
+
                 a.href = "/download";
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-
+                
                 window.URL.revokeObjectURL(url);
+
             } catch (err) {
                 statusDiv.innerHTML = "⚠️ Não foi possível baixar o PDF.";
-
                 statusDiv.style.color = "#ffb400";
             }
         });
-
     </script>
 
 </body>

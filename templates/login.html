@@ -285,28 +285,7 @@
             font-size: 13px;
         }
 
-        /* ALERT */
 
-        .alert-area {
-            margin-left: 10%;
-            margin-top: 10px;
-            margin-right: auto;
-            width: fit-content;
-        }
-
-        .alert {
-            font-size: 13px;
-            padding: 0px;
-            font-family: 'Agenda';
-        }
-
-        .alert.erro {
-            color: #a10000;
-        }
-
-        .alert.sucesso {
-            color: #006622;
-        }
     </style>
 </head>
 
@@ -327,17 +306,6 @@
                         <div class="inputs">
                             <input type="text" placeholder="nome de usuário" id="username" name="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                             <input type="password" placeholder="senha" id="password" name="password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            {% with messages = get_flashed_messages(with_categories=True) %}
-                            {% if messages %}
-                            <div class="alert-area">
-                                {% for category, message in messages %}
-                                <div class="alert {{ category }}">
-                                    {{ message }}
-                                </div>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                            {% endwith %}
                         </div>
 
                         <div class="lembrar">
