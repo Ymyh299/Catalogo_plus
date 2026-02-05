@@ -22,7 +22,6 @@
             box-sizing: border-box;
             font-family: 'Agenda', sans-serif;
             overflow: hidden;
-            /* Evita scroll na página principal */
             height: 100vh;
         }
 
@@ -88,7 +87,6 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Centraliza verticalmente */
             flex: 1;
             width: 100%;
             padding: 20px;
@@ -108,9 +106,7 @@
         }
 
         /* CARROSSEL WRAPPER */
-        /* Ajustado para proporção 9:16 exata */
         .carousel-wrapper {
-            /* Define o tamanho pela altura, a largura se ajusta sozinha */
             height: 65vh;
             max-height: 700px;
             aspect-ratio: 9 / 16;
@@ -118,10 +114,7 @@
             overflow: hidden;
             border-radius: 15px;
             cursor: grab;
-
-            /* Estilo Vidro/Clean */
             background-color: #fff;
-            /* Fundo branco para imagens transparentes */
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.5);
 
@@ -135,7 +128,6 @@
         .carousel {
             display: flex;
             height: 100%;
-            /* Ocupa altura total do wrapper */
             transition: transform 0.3s ease;
         }
 
@@ -143,13 +135,13 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Garante que preencha o 9:16 */
             flex-shrink: 0;
             user-select: none;
             pointer-events: none;
         }
 
         /* INDICADORES */
+
         .indicators {
             display: flex;
             justify-content: center;
@@ -211,15 +203,12 @@
 
             .carousel-wrapper {
                 height: 60vh;
-                /* Um pouco menor no celular para caber botão */
             }
 
             .titulo p {
                 font-size: 24px;
             }
         }
-
-        /* Telas muito baixas */
         @media (max-height: 650px) {
             .carousel-wrapper {
                 height: 55vh;
@@ -263,6 +252,44 @@
         </div>
     </main>
 
+
+    </script>
+    <div id="flash-wrapper" style="display: none;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message-data" data-category="{{ category }}" data-message="{{ message }}"></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const messageDivs = document.querySelectorAll('.flash-message-data');
+
+            messageDivs.forEach(div => {
+                const category = div.getAttribute('data-category');
+                const message = div.getAttribute('data-message');
+
+                let iconType = 'info';
+                if (category === 'erro') iconType = 'error';
+                else if (category === 'sucesso') iconType = 'success';
+                else if (category === 'aviso') iconType = 'warning';
+
+                Swal.fire({
+                    title: 'Atenção',
+                    text: message,
+                    icon: iconType,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#333',
+                    timer: 10000,
+                    timerProgressBar: true
+                });
+            });
+        });
+    </script>
     <script>
 
         const carouselWrapper = document.getElementById("carouselWrapper");

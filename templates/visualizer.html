@@ -23,7 +23,6 @@
             overflow: hidden;
             height: 100vh;
             background-color: #f0f0f0;
-            /* Fallback */
         }
 
         @font-face {
@@ -83,23 +82,18 @@
         /* CONTAINER DE CONTEÚDO */
         .container {
             flex: 1;
-            /* Ocupa o resto da tela */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            /* Começa do topo, não do meio */
             padding-top: 15px;
-            /* Espaço pequeno do topo */
             width: 100%;
             box-sizing: border-box;
             overflow-y: auto;
-            /* Permite scroll se a tela for muito pequena na altura */
         }
 
         .titulo {
             margin-bottom: 10px;
-            /* Reduzi a margem */
             text-align: center;
         }
 
@@ -110,23 +104,15 @@
             color: rgb(60, 60, 60);
         }
 
-        /* CONTAINER DO VISUALIZADOR */
-        /* Aqui está a mágica da proporção e do "não-quadradão" */
         .pdf-container {
-            /* Define a altura baseada na tela para garantir que caiba */
             height: 75vh;
             max-height: 800px;
-            /* Limite para telas gigantes */
-
-            /* A largura é calculada AUTOMATICAMENTE pela proporção */
             aspect-ratio: 9 / 16;
             width: auto;
-
             display: flex;
             flex-direction: column;
             padding: 15px;
             border-radius: 20px;
-            /* Mais arredondado */
             background-color: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
@@ -135,7 +121,7 @@
             margin-bottom: 20px;
         }
 
-        /* HEADER INTERNO (PDF + BOTÃO) */
+        /* CABEÇALHO DO PDF */
         .header-pdf {
             display: flex;
             justify-content: space-between;
@@ -144,7 +130,6 @@
             padding-bottom: 8px;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
-            /* Não deixa encolher */
         }
 
         .header-pdf span {
@@ -176,7 +161,6 @@
         /* ÁREA DO IFRAME */
         .pdf-visualizer {
             flex: 1;
-            /* Ocupa todo o espaço restante do container */
             width: 100%;
             background-color: #fff;
             border-radius: 10px;
@@ -198,7 +182,6 @@
             }
 
             .pdf-container {
-                /* No celular, aumentamos um pouco a altura relativa */
                 height: 78vh;
                 padding: 12px;
             }
@@ -206,9 +189,10 @@
             .titulo p {
                 font-size: 18px;
             }
+
+            
         }
 
-        /* Ajuste para telas muito baixas (Landscape) */
         @media (max-height: 600px) {
             .pdf-container {
                 height: 70vh;
@@ -231,7 +215,7 @@
         <header>
             <a href="/opcoes" class="fa-solid fa-arrow-left"></a>
             <p class="tit">Catálogo+</p>
-            <a href="/" class="fa-solid fa-house"></a>
+            <a href="/liberar_sessao" class="fa-solid fa-house"></a>
         </header>
 
         <div class="container">
@@ -264,7 +248,7 @@
             try {
                 const response = await fetch("/download");
                 if (!response.ok) throw new Error("Erro ao baixar PDF");
-                
+
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
@@ -273,7 +257,7 @@
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
-                
+
                 window.URL.revokeObjectURL(url);
 
             } catch (err) {
@@ -281,6 +265,13 @@
                 statusDiv.style.color = "#ffb400";
             }
         });
+
+        const tempoLimite = 5 * 60 * 1000;
+
+        setTimeout(function () {
+            window.location.href = "{{ url_for('liberar_sessao') }}";
+        }, tempoLimite);
+
     </script>
 
 </body>

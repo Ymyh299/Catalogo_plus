@@ -59,3 +59,5 @@ try {
 }
 
 app.scriptPreferences.userInteractionLevel = oldUI;
+app.quit();
+

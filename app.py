@@ -16,12 +16,24 @@ import os
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
+
+# CONFIGS
+#-------------------------------------------------
+
+
 DB_CONFIG = { 
     "host": os.getenv('DB_HOST'),
     "user": os.getenv('DB_USER'),
     "password": os.getenv('DB_PASS'),
     "database": os.getenv('DB_NAME')
 }
+
+SESSION_LOCK = {
+    "user_id": None,  
+    "last_active": 0  
+}
+
+LOCK_TIMEOUT = 1800
 
 API_URL_BASE = os.getenv('API_URL_BASE')
 COMPANY_ID = os.getenv('COMPANY_ID')
@@ -44,6 +56,14 @@ JSX_SCRIPT_PRODUTO = os.path.join(DATA_DIR, "script_produto.jsx")
 
 PDF_PATH = os.path.join(DATA_DIR, "output", "resultado.pdf")
 
+#-------------------------------------------------
+
+
+
+
+# ROUTES LOGIN/LOGOUT e SESSION
+#-------------------------------------------------
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -57,11 +77,8 @@ def login():
     if request.method == "POST":
         usuario = request.form.get("username")
         senha = request.form.get("password")
-
-        # Conectar ao banco
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
-
         cursor.execute("SELECT * FROM usuarios WHERE user = %s", (usuario,))
         user = cursor.fetchone()
 
@@ -72,12 +89,10 @@ def login():
             flash("Usuário ou senha incorretos.", "erro")
             return redirect(url_for("login"))
 
-        # Verificar senha usando bcrypt (Werkzeug)
         if not check_password_hash(user["password_hash"], senha):
             flash("Usuário ou senha incorretos.", "erro")
             return redirect(url_for("login"))
 
-        # Login OK
         session["user_id"] = user["id"]
         session["usuario"] = user["user"]
 
@@ -91,21 +106,84 @@ def logout():
     session.pop("usuario", None)
     return redirect(url_for("login"))
 
+def check_session_queue(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        current_user = session.get("user_id")
+        now = time.time()
+        
+        if SESSION_LOCK["user_id"] is not None:
+            if now - SESSION_LOCK["last_active"] > LOCK_TIMEOUT:
+                SESSION_LOCK["user_id"] = None
+        
+        if SESSION_LOCK["user_id"] is None or SESSION_LOCK["user_id"] == current_user:
+            SESSION_LOCK["user_id"] = current_user
+            SESSION_LOCK["last_active"] = now 
+            return f(*args, **kwargs)
+        
+        else:
+            return render_template("waiting.html")
+            
+    return decorated_function
+
+@app.route("/liberar_sessao")
+@login_required
+def liberar_sessao():
+    if SESSION_LOCK["user_id"] == session.get("user_id"):
+        SESSION_LOCK["user_id"] = None
+    return redirect(url_for("index"))
+
+#-------------------------------------------------
+
+
+
+
+# TEMPLATES
+#-------------------------------------------------
+
 @app.route("/")
 @login_required
 def index():
     return render_template("index.html", usuario=session["usuario"])
 
 
-
-
 @app.route("/visualizar")
 @login_required
+@check_session_queue
 def visualizar():
     return render_template("visualizer.html", usuario=session["usuario"])
 
 
+@app.route('/painel', methods=["GET", "POST"])
+@login_required
+@check_session_queue
+def painel():
+    layout_escolhido = request.form.get('layout_escolhido')
+    print(f"Layout escolhido: {layout_escolhido}")
+    session['layout_escolhido'] = layout_escolhido
+    return render_template("painel.html", usuario=session["usuario"])
 
+
+@app.route("/opcoes", methods=["POST"])
+@login_required
+@check_session_queue
+def opcoes():
+    raw_referencias = request.form.get("referencias")
+    session['referencias'] = raw_referencias
+
+    print(f"🔄 Iniciando atualização para: {raw_referencias}")
+    processar_lista_referencias(raw_referencias)
+    print("✅ Atualização concluída. Renderizando template.")
+
+    return render_template("option.html")
+
+#-------------------------------------------------
+
+
+
+
+# FILE ROUTES
+#-------------------------------------------------
 
 @app.route('/foto/<ref>')
 def foto(ref):
@@ -117,43 +195,19 @@ def resultado():
     path = "C:\\Users\\Administrador\\Documents\\Sistemas\\PDFgenerator\\indesign\\output\\resultado.pdf"
     return send_file(path)
 
+#-------------------------------------------------
 
 
 
-@app.route('/painel', methods=["GET", "POST"])
-@login_required
-def painel():
-    layout_escolhido = request.form.get('layout_escolhido')
-    print(f"Layout escolhido: {layout_escolhido}")
-    session['layout_escolhido'] = layout_escolhido
-    return render_template("painel.html", usuario=session["usuario"])
 
-    
-
-@app.route("/opcoes", methods=["POST"])
-@login_required
-def opcoes():
-    raw_referencias = request.form.get("referencias")
-    session['referencias'] = raw_referencias
-    
-
-    print(f"🔄 Iniciando atualização para: {raw_referencias}")
-    processar_lista_referencias(raw_referencias)
-    print("✅ Atualização concluída. Renderizando template.")
-
-    return render_template("option.html")
-
+# FUNÇÕES AUXILIARES
+#-------------------------------------------------
 
 def obter_slug_por_code(code):
-    """
-    Consulta o banco de dados local para encontrar o slug a partir do code.
-    Retorna o slug (string) ou None se não encontrar.
-    """
     slug = None
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor()
-        # Busca exata pelo code
         cursor.execute("SELECT slug FROM products WHERE code = %s LIMIT 1", (code,))
         resultado = cursor.fetchone()
         if resultado:
@@ -166,20 +220,12 @@ def obter_slug_por_code(code):
     return slug
 
 def worker_atualizar_ref(code):
-    """
-    1. Pega o code.
-    2. Descobre o slug no banco.
-    3. Usa o slug na API Vesti para atualizar preço e composição.
-    """
-    # PASSO 1: Obter o Slug
     slug_db = obter_slug_por_code(code)
     
     if not slug_db:
         print(f"⏭️ Pular {code}: Slug não encontrado no banco de dados.")
         return False
 
-    # PASSO 2: Consultar API usando o SLUG
-    # Note que trocamos {code} por {slug_db} na URL
     url = (
         f"https://apivesti.vesti.mobi/appmarca/v1/products/company/"
         f"{COMPANY_ID}/product/{slug_db}/showcase?cid=7368dc35b43219a&reseller_id=null"
@@ -190,23 +236,18 @@ def worker_atualizar_ref(code):
         response.raise_for_status()
         data = response.json().get("product_group", {})
 
-        # Extração de dados (API Showcase retorna a estrutura dentro de 'product_group')
-        # Garantimos que estamos pegando os dados frescos da API
         novo_price = data.get("price")
         novo_promotional = data.get("promotion")
         novo_price_promo = data.get("price_promotional")
         nova_compo = data.get("composition")
         product_id = data.get("id")
         
-        # Tamanhos (opcional, mas bom manter atualizado)
         sizes = data.get("sizes", [])
         sizes_names = ",".join(s["name"] for s in sizes)
 
-        # PASSO 3: Atualizar no Banco
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor()
 
-        # Update focado nas colunas pedidas, usando o CODE original como chave (ou o slug)
         sql = """
             UPDATE products 
             SET 
@@ -248,26 +289,30 @@ def worker_atualizar_ref(code):
         return False
 
 def processar_lista_referencias(referencias_str):
-    """
-    Recebe a string bruta do form (ex: 'A5000, B3000') e executa o update.
-    """
     if not referencias_str:
         return
 
-    # Limpeza da string: remove espaços e quebra por vírgula ou nova linha
     lista_codes = [
         code.strip() 
         for code in referencias_str.replace('\n', ',').split(',') 
         if code.strip()
     ]
 
-    # Executa em paralelo para não travar a requisição por muito tempo
-    # Ajuste max_workers conforme a capacidade do seu servidor
     with ThreadPoolExecutor(max_workers=5) as executor:
         futures = [executor.submit(worker_atualizar_ref, code) for code in lista_codes]
-        # Espera todos terminarem antes de liberar a rota
         for future in as_completed(futures):
             future.result()
+
+def kill_indesign_force():
+    print("⚠️  Iniciando protocolo de encerramento forçado do InDesign...")
+    try:
+        subprocess.run(["taskkill", "/F", "/IM", "InDesign.exe"], 
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["taskkill", "/F", "/IM", "wscript.exe"], 
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print("✅  Processos do InDesign encerrados.")
+    except Exception as e:
+        print(f"❌  Erro ao tentar matar processos: {e}")
 
 
 def escolher_script(capa: bool, contracapa: bool) -> str:
@@ -286,7 +331,6 @@ def executar_indesign_with_jsx(jsx_path: str) -> bool:
 Set app = CreateObject("InDesign.Application")
 app.DoScript "{jsx_path}", 1246973031
 '''
-    # criar arquivo VBS temporário
     fd, vbs_temp_path = tempfile.mkstemp(suffix=".vbs", prefix="run_jsx_")
     os.close(fd)
     try:
@@ -302,9 +346,11 @@ app.DoScript "{jsx_path}", 1246973031
             return False
     except subprocess.TimeoutExpired:
         print("Execução do InDesign/VBS expirou.")
+        kill_indesign_force()
         return False
     except Exception as e:
         print("Erro ao executar vbs temporário:", e)
+        kill_indesign_force()
         return False
     finally:
         try:
@@ -319,9 +365,16 @@ def clean_composition(text):
     text = text.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ')
     return text
 
+#-------------------------------------------------
+
+
+
+
+# ROUTES PRINCIPAIS DE GERAÇÃO
+#-------------------------------------------------
+
 @app.route("/gerar_planilha", methods=["POST"])
 def gerar_planilha():
-    # receber dados do form (JSON string)
     dados_json = request.form.get("dados_json")
 
     if not dados_json:
@@ -380,16 +433,14 @@ def gerar_planilha():
 
         name, price, promotional, price_promotional, composition, sizes_raw = result
 
-        # --- LÓGICA DE TAMANHOS (VALORES DINÂMICOS) ---
         tms = {f"{t}": "" for t in ["pp", "p", "m", "g", "gg", "u"]}
         pre = {f"{t}": "" for t in ["pp", "p", "m", "g", "gg", "u"]}
         
-        # --- LÓGICA DE CAMPOS FIXOS (COLUNAS K, L, M, P, S, V, Y, AB) ---
         if want_tamanho:
-            texto_tamanho = "Tamanhos disponíveis:" # Coluna K
-            circulo = "O"                            # Coluna L
-            fixed_pp, fixed_p, fixed_m = "PP", "P", "M" # M, P, S
-            fixed_g, fixed_gg, fixed_u = "G", "GG", "U" # V, Y, AB
+            texto_tamanho = "Tamanhos disponíveis:"
+            circulo = "O"
+            fixed_pp, fixed_p, fixed_m = "PP", "P", "M"
+            fixed_g, fixed_gg, fixed_u = "G", "GG", "U"
             
             if sizes_raw:
                 lista_tamanhos_db = [s.strip().upper() for s in sizes_raw.split(",")]
@@ -401,16 +452,15 @@ def gerar_planilha():
             texto_tamanho = circulo = ""
             fixed_pp = fixed_p = fixed_m = fixed_g = fixed_gg = fixed_u = ""
 
-        # Preço
+
         if want_preco:
             if promotional == 1:
                 de_ou_por, preco_original, traco, real, preco_promocional, por, realfixo = "DE:", price, "\\", "R$", price_promotional, "POR:", "R$"
             else:
-                de_ou_por, preco_original, traco, real, preco_promocional, por, realfixo = "POR:", price, "", "", "", "", ""
+                de_ou_por, preco_original, traco, real, preco_promocional, por, realfixo = "POR:", price, "", "", "", "", "R$"
         else:
             de_ou_por = preco_original = traco = real = preco_promocional = por = realfixo = ""
 
-        # Composição com limite de caracteres
         comp = ""
         if want_composicao:
             comp_bruta = clean_composition(composition)
@@ -429,28 +479,27 @@ def gerar_planilha():
             "realfixo": realfixo,
             "preco_promocional": preco_promocional,
             "composicao": comp,
-            # Novos campos fixos
-            "texto_tamanho": texto_tamanho, # K
-            "circulo": circulo,             # L
-            "fixed_pp": fixed_pp,           # M
-            "tamanho PP": tms["pp"],        # N
-            "preenchimento PP": pre["pp"],  # O
-            "fixed_p": fixed_p,             # P
-            "tamanho P": tms["p"],          # Q
-            "preenchimento P": pre["p"],    # R
-            "fixed_m": fixed_m,             # S
-            "tamanho M": tms["m"],          # T
-            "preenchimento M": pre["m"],    # U
-            "fixed_g": fixed_g,             # V
-            "tamanho G": tms["g"],          # W
-            "preenchimento G": pre["g"],    # X
-            "fixed_gg": fixed_gg,           # Y
-            "tamanho GG": tms["gg"],        # Z
-            "preenchimento GG": pre["gg"],  # AA
-            "fixed_u": fixed_u,             # AB
-            "tamanho U": tms["u"],          # AC
-            "preenchimento U": pre["u"],    # AD
-            "@fotos": foto_path             # AE
+            "texto_tamanho": texto_tamanho, 
+            "circulo": circulo,             
+            "fixed_pp": fixed_pp,           
+            "tamanho PP": tms["pp"],        
+            "preenchimento PP": pre["pp"],  
+            "fixed_p": fixed_p,             
+            "tamanho P": tms["p"],          
+            "preenchimento P": pre["p"],    
+            "fixed_m": fixed_m,             
+            "tamanho M": tms["m"],          
+            "preenchimento M": pre["m"],    
+            "fixed_g": fixed_g,             
+            "tamanho G": tms["g"],          
+            "preenchimento G": pre["g"],    
+            "fixed_gg": fixed_gg,           
+            "tamanho GG": tms["gg"],        
+            "preenchimento GG": pre["gg"],  
+            "fixed_u": fixed_u,             
+            "tamanho U": tms["u"],          
+            "preenchimento U": pre["u"],    
+            "@fotos": foto_path             
         }
         lista_produtos.append(linha_produto)
 
@@ -462,7 +511,6 @@ def gerar_planilha():
 
     df_produtos = pd.DataFrame(lista_produtos)
     
-    # Ordem exata das colunas para o Data Merge do InDesign
     col_order = [
         "referencia", "nome", "de_ou_por", "preco_original", "traco", "por", "real", "realfixo", "preco_promocional", "composicao",
         "texto_tamanho", "circulo", 
@@ -503,17 +551,16 @@ def gerar_planilha():
         if os.path.exists(CSV_CONTRACAPA_PATH):
             os.remove(CSV_CONTRACAPA_PATH)
 
-    # escolher qual JSX usar
     script_to_run = escolher_script(want_capa, want_contracapa)
 
-    # executar InDesign chamando o JSX adequado
     sucesso = executar_indesign_with_jsx(script_to_run)
 
     if sucesso:
         time.sleep(5)
         return redirect(url_for('visualizar'))
     else:
-        return jsonify({"erro": "Falha ao executar o InDesign (VBS/JSX)."}), 500
+        flash("Ocorreu um erro crítico no InDesign ou Timeout. O processo foi reiniciado por segurança.", "erro")
+        return redirect(url_for('liberar_sessao'))
     
 
 
@@ -524,7 +571,6 @@ def download_pdf():
         return jsonify({"erro": "PDF não encontrado."}), 404
 
     nome = session.get("nome_arquivo_escolhido")
-    # sanitize: opcionalmente remova espaços/char inválidos do nome
     nome = "".join(c for c in nome if c.isalnum() or c in (" ", "-", "_")).strip()
     if not nome:
         nome = "arquivo_final"
@@ -534,6 +580,8 @@ def download_pdf():
         as_attachment=True,
         download_name=f"{nome}.pdf"
     )
+
+#-------------------------------------------------
 
 
 if __name__ == "__main__":

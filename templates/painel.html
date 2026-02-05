@@ -272,7 +272,6 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            /* Placeholder */
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none"><text x="50%" y="50%" font-family="Arial" font-size="5" fill="%23ccc" text-anchor="middle">Preview</text></svg>');
         }
 
@@ -439,9 +438,9 @@
 <body>
     <main>
         <header>
-            <a href="/" class="fa-solid fa-arrow-left"></a>
+            <a href="/liberar_sessao" class="fa-solid fa-arrow-left"></a>
             <p class="tit">Catálogo+</p>
-            <a href="/" class="fa-solid fa-house"></a>
+            <a href="/liberar_sessao" class="fa-solid fa-house"></a>
         </header>
 
         <div class="container">
@@ -458,7 +457,7 @@
                             oninput="this.value = this.value.toUpperCase()">
                     </div>
                     <div class="buttonadd">
-                        <button type="submit">Adicionar <i class="fa-solid fa-plus"></i></button>
+                        <button type="submit" id="btn-add">Adicionar <i class="fa-solid fa-plus"></i></button>
                     </div>
                 </form>
 
@@ -504,7 +503,9 @@
             iptrefs: document.getElementById('referencias'),
             contador: document.getElementById('count-number'),
             popupSync: document.getElementById('popup-sync'),
-            form: document.getElementById('form')
+            form: document.getElementById('form'),
+            btnAdd: document.getElementById('btn-add'),
+            alertShown: false
         };
 
         let timeoutId;
@@ -536,12 +537,10 @@
             elementos.imgdiv.style.backgroundImage = '';
         }
 
-        // Listener de input: tenta carregar a imagem da última referência que está sendo digitada
         elementos.inputref.addEventListener('input', () => {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 const valor = elementos.inputref.value.trim();
-                // Pega apenas a última parte após o espaço ou vírgula para o preview
                 const partes = valor.split(/[,\s]+/);
                 const ultimaRef = partes[partes.length - 1];
                 carregarImagem(ultimaRef);
@@ -553,7 +552,6 @@
             const rawValue = elementos.inputref.value.trim();
             if (!rawValue) return;
 
-            // Divide a string por vírgula OU espaço (um ou mais) e remove itens vazios
             const refsArray = rawValue.split(/[,\s]+/).filter(ref => ref.length > 0);
 
             refsArray.forEach(ref => {
@@ -583,8 +581,6 @@
                 li.appendChild(span);
                 li.appendChild(deleteBtn);
                 elementos.refsList.appendChild(li);
-
-                // Exibe a imagem da última referência adicionada do grupo
                 carregarImagem(refUpper);
             });
 
@@ -594,9 +590,22 @@
         });
 
         function atualizarContador() {
-            if (elementos.contador && elementos.refsList) {
-                // Conta quantos <li> existem dentro da <ul>
-                elementos.contador.innerText = elementos.refsList.children.length;
+            if (!elementos.contador || !elementos.refsList) return;
+            const count = elementos.refsList.children.length;
+            elementos.contador.innerText = count;
+
+            console.log('atualizarContador count=', count);
+
+            if (count > 120) {
+                elementos.contador.style.color = 'red';
+                if (!elementos.alertShown) {
+                    elementos.alertShown = true;
+                    console.log('exceeded threshold, showing alert');
+                    alert('⚠️ Atenção: Você excedeu o limite recomendado de 120 referências. O desempenho pode ser afetado.');
+                }
+            } else {
+                elementos.contador.style.color = '';
+                elementos.alertShown = false;
             }
         }
 

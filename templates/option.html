@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
     <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -239,7 +239,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Efeito de clique e feedback visual */
         #btn-salvar {
             transition: all 0.3s ease;
             position: relative;
@@ -250,7 +249,6 @@
             transform: scale(0.95);
         }
 
-        /* Classe de animação de "Processando" */
         .btn-loading {
             pointer-events: none;
             opacity: 0.8;
@@ -283,41 +281,7 @@
             }
         }
 
-        /* Container dos pontos */
-        .dots {
-            display: inline-flex;
-        }
 
-        /* Estilo individual de cada ponto */
-        .dots span {
-            animation: blink 1.4s infinite both;
-        }
-
-        /* Delay para criar o efeito de sequência (1º, 2º e 3º ponto) */
-        .dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        /* A animação propriamente dita */
-        @keyframes blink {
-            0% {
-                opacity: 0.2;
-            }
-
-            20% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.2;
-            }
-        }
-
-        /* Estilo visual quando o botão está desabilitado (opcional) */
         #btn-salvar:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
@@ -336,6 +300,7 @@
             }
         }
 
+
         /* --- SEGUNDO CONTAINER (PREVIEW) --- */
         .second-container {
             flex: 1;
@@ -346,7 +311,6 @@
             padding: 40px;
             overflow-y: auto;
             flex-wrap: wrap;
-            /* Importante para desktop */
         }
 
         .imgcapa-container,
@@ -356,7 +320,6 @@
             align-items: center;
         }
 
-        /* Visual das "Folhas/Capas" */
         .imgcapa,
         .imgcontracapa {
             width: 320px;
@@ -467,7 +430,7 @@
             color: white;
         }
 
-        /* --- RESPONSIVIDADE (MOBILE SPLIT SCREEN CORRIGIDO) --- */
+        /* RESPONSIVIDADE */
         @media (max-width: 768px) {
             .container {
                 flex-direction: row;
@@ -483,11 +446,8 @@
                 width: 50%;
                 flex: none;
                 padding: 15px 5px;
-                /* A CORREÇÃO MÁGICA ABAIXO: */
                 flex-direction: column;
-                /* Empilha verticalmente */
                 flex-wrap: nowrap;
-                /* PROIBE jogar para a direita (coluna invisível) */
                 align-items: center;
                 justify-content: flex-start;
                 gap: 20px;
@@ -583,7 +543,6 @@
             padding: 20px;
         }
 
-        /* Botão Fechar */
         .close-visu {
             position: absolute;
             top: -10px;
@@ -599,12 +558,9 @@
             box-shadow: 0 4px 10px rgba(60, 60, 60, 0.3);
         }
 
-        /* CONTAINER DA IMAGEM (9:16) */
         .imgexemple {
             width: 320px;
-            /* Largura base */
             aspect-ratio: 9 / 16;
-            /* Proporção Mágica */
             background-image: url('/static/images/a5045.jpg');
             background-size: cover;
             background-position: center;
@@ -630,7 +586,6 @@
             width: 72px;
         }
 
-        /* Estilo Referência */
         .referencia {
             background-image: url('/static/images/ref.png');
             background-repeat: no-repeat;
@@ -645,8 +600,6 @@
             width: 86px;
             height: 96px;
         }
-
-        /* Estilo Preço */
         .preco {
             background-image: url('/static/images/preco.png');
             background-repeat: no-repeat;
@@ -667,7 +620,6 @@
             width: 100%;
         }
 
-        /* Estilo Composição */
         .imgexemple-inf {
             background-image: url('/static/images/comp.png');
             background-repeat: no-repeat;
@@ -683,7 +635,6 @@
             width: 161px;
         }
 
-        /* Estilo Tamanhos */
         .tamanho-visu {
             background-image: url('/static/images/tamanho.png');
             background-repeat: no-repeat;
@@ -703,7 +654,6 @@
         @media (max-width: 360px) {
             .imgexemple {
                 width: 85vw;
-                /* Se ajusta a tela */
             }
         }
     </style>
@@ -714,7 +664,7 @@
         <header>
             <a href="/painel" class="fa-solid fa-arrow-left"></a>
             <p class="tit">Catálogo+</p>
-            <a href="/" class="fa-solid fa-house"></a>
+            <a href="/liberar_sessao" class="fa-solid fa-house"></a>
         </header>
 
         <div class="container">
@@ -723,29 +673,7 @@
                     <div class="opcoes-container">
                         <p class="titopc">Opcionais</p>
                         <div class="opcoes">
-                            <div class="Produto">
-                                <p>Produto</p>
-                                <label class="linha">
-                                    <input type="checkbox" class="opc" value="referencia" id="iptreferencia">
-                                    <span class="circle"></span>
-                                    Referência
-                                </label>
-                                <label class="linha">
-                                    <input type="checkbox" class="opc" value="preco" id="iptpreco">
-                                    <span class="circle"></span>
-                                    Preço
-                                </label>
-                                <label class="linha">
-                                    <input type="checkbox" class="opc" value="composicao" id="iptcomposicao">
-                                    <span class="circle"></span>
-                                    Composição
-                                </label>
-                                <label class="linha">
-                                    <input type="checkbox" class="opc" value="tamanho" id="ipttamanho">
-                                    <span class="circle"></span>
-                                    Tamanho
-                                </label>
-                            </div>
+                            
 
                             <div class="capa">
                                 <p>Capa</p>
@@ -793,6 +721,30 @@
                                 </div>
                             </div>
 
+                            <div class="Produto">
+                                <p>Produto</p>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="referencia" id="iptreferencia">
+                                    <span class="circle"></span>
+                                    Referência
+                                </label>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="preco" id="iptpreco">
+                                    <span class="circle"></span>
+                                    Preço
+                                </label>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="composicao" id="iptcomposicao">
+                                    <span class="circle"></span>
+                                    Composição
+                                </label>
+                                <label class="linha">
+                                    <input type="checkbox" class="opc" value="tamanho" id="ipttamanho">
+                                    <span class="circle"></span>
+                                    Tamanho
+                                </label>
+                            </div>
+
                             <div class="button-visualizar">
                                 <button class="button-48" onclick="abrirVisualizar()" type="button">Visualizar
                                     PDF</button>
@@ -834,7 +786,7 @@
                     autocapitalize="off" spellcheck="false">
                 <input type="hidden" name="dados_json" id="dados-json">
                 <div class="buttons">
-                    <button type="button" onclick="fecharPopup()">Cancelar</button>
+                    <button type="button" onclick="fecharPopup()" id="btn-cancelar">Cancelar</button>
                     <button type="submit" id="btn-salvar">Salvar</button>
                 </div>
             </form>
@@ -874,6 +826,8 @@
         </div>
     </div>
 
+    
+
     <script>
         // Variáveis globais
         const elementos = {
@@ -906,7 +860,9 @@
             checkRefInput: document.getElementById('iptreferencia'),
             checkPrecoInput: document.getElementById('iptpreco'),
             checkCompInput: document.getElementById('iptcomposicao'),
-            checkTamInput: document.getElementById('ipttamanho')
+            checkTamInput: document.getElementById('ipttamanho'),
+            btnCancelar: document.getElementById('btn-cancelar')
+
         };
 
         let timeoutId;
@@ -1057,17 +1013,7 @@
             elementos.inputNomeArquivo.value = '';
         }
 
-        elementos.popup.addEventListener('click', function (e) {
-            if (e.target === elementos.popup) {
-                fecharPopup();
-            }
-        });
 
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && elementos.popup.style.display === 'flex') {
-                fecharPopup();
-            }
-        });
 
         function abrirVisualizar() {
 
@@ -1077,28 +1023,24 @@
                 elementos.visuRef.style.display = 'none';
             }
 
-            // 2. Verifica Preço
             if (elementos.checkPrecoInput.checked) {
                 elementos.visuPreco.style.display = 'block';
             } else {
                 elementos.visuPreco.style.display = 'none';
             }
 
-            // 3. Verifica Composição
             if (elementos.checkCompInput.checked) {
                 elementos.visuComp.style.display = 'block';
             } else {
                 elementos.visuComp.style.display = 'none';
             }
 
-            // 4. Verifica Tamanho
             if (elementos.checkTamInput.checked) {
                 elementos.visuTam.style.display = 'block';
             } else {
                 elementos.visuTam.style.display = 'none';
             }
 
-            // Mostra o Popup
             elementos.popupVisualizar.style.display = 'flex';
         }
 
@@ -1106,25 +1048,16 @@
             elementos.popupVisualizar.style.display = 'none';
         }
 
-        // Fechar ao clicar fora da imagem
-        elementos.popupVisualizar.addEventListener('click', function (e) {
-            if (e.target === elementos.popupVisualizar) {
-                fecharPopupVisualizar();
-            }
-        });
 
-        // Tecla ESC para fechar
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && elementos.popupVisualizar.style.display === 'flex') {
-                fecharPopupVisualizar();
-            }
-        });
+
 
 
         elementos.formArquivo.addEventListener('submit', function (e) {
 
             const btnSalvar = document.getElementById("btn-salvar");
-            btnSalvar.classList.add("btn-loading"); // Adiciona o spinner
+            btnSalvar.classList.add("btn-loading"); 
+            elementos.btnCancelar.disabled = true; 
+            
 
             if (!elementos.inputNomeArquivo.value.trim()) {
                 alert('Digite um nome para o arquivo');

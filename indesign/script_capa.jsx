@@ -36,15 +36,9 @@ var oldUI = app.scriptPreferences.userInteractionLevel;
 app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERACT;
 
 try {
-
-    // 1) GERAR CAPA
     gerarPDF(TEMPLATE_CAPA, CSVCAPA, PDF_CAPA);
-
-    // 2) GERAR PRODUTOS (n páginas)
     gerarPDF(TEMPLATE_PRODUTOS, CSVPRODUTOS, PDF_PRODUTOS);
 
-
-    // 4) MONTAR PDF FINAL (capa + produtos + contracapa)
     var finalDoc = app.documents.add();
     var page = finalDoc.pages[0];
 
@@ -73,3 +67,5 @@ try {
 
 
 app.scriptPreferences.userInteractionLevel = oldUI;
+app.quit();
+

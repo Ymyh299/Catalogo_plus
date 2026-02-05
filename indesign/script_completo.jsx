@@ -24,7 +24,7 @@ function gerarPDF(template, csv, pdfOut) {
     doc.dataMergeProperties.selectDataSource(csv);  
     doc.dataMergeProperties.updateDataSource();
 
-    doc.dataMergeProperties.mergeRecords();  // merge completo
+    doc.dataMergeProperties.mergeRecords();
 
     var merged = app.activeDocument;
 
@@ -40,16 +40,10 @@ app.scriptPreferences.userInteractionLevel = UserInteractionLevels.NEVER_INTERAC
 
 try {
 
-    // 1) GERAR CAPA
     gerarPDF(TEMPLATE_CAPA, CSVCAPA, PDF_CAPA);
-
-    // 2) GERAR PRODUTOS (n páginas)
     gerarPDF(TEMPLATE_PRODUTOS, CSVPRODUTOS, PDF_PRODUTOS);
-
-    // 3) GERAR CONTRACAPA
     gerarPDF(TEMPLATE_CONTRA, CSVCONTRACAPA, PDF_CONTRA);
 
-    // 4) MONTAR PDF FINAL (capa + produtos + contracapa)
     var finalDoc = app.documents.add();
     var page = finalDoc.pages[0];
 
@@ -81,3 +75,5 @@ try {
 
 
 app.scriptPreferences.userInteractionLevel = oldUI;
+app.quit();
+

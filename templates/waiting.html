@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5">
+    <title>Catalogo+</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Agenda', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url("../static/images/background.png");
+            background-size: cover;
+            background-position: center;
+        }
+
+        @font-face {
+            font-family: 'Chetta';
+            src: url("../static/fonts/chettavissto/ChettaVissto.woff");
+        }
+
+        @font-face {
+            font-family: 'Agenda';
+            src: url("../static/fonts/agenda/agenda-light.ttf");
+        }
+
+        @font-face {
+            font-family: 'Agenda Bold';
+            src: url("../static/fonts/agenda/agenda-bold.ttf");
+        }
+
+        main {
+            height: 100vh;
+            background-image: url("../static/images/background.png");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* HEADER */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 55px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            border-bottom: 2px solid rgb(60, 60, 60);
+            backdrop-filter: blur(6px);
+            background-color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .tit {
+            font-family: 'Chetta';
+            font-size: 30px;
+            margin: 0;
+            color: rgb(60, 60, 60);
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+
+            margin-top: 10%;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        h1 {
+            font-family: 'Chetta';
+            font-size: 36px;
+            color: #333;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        i {
+            font-size: 50px;
+            color: rgb(60, 60, 60);
+        }
+
+        p {
+            font-family: 'Agenda', sans-serif;
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        strong {
+            font-family: 'Agenda Bold', sans-serif;
+            color: #000;
+            font-weight: normal;
+        }
+
+        @media (max-width: 540px) {
+            .box {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <p class="tit">Catálogo+</p>
+    </header>
+    <main>
+        <div class="box">
+            <h1>Sistema em Uso</h1>
+
+            <p>Outro usuário está gerando um catálogo no momento.</p>
+            <div class="loader">
+                <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+            </div>
+            <p>Sua posição na fila está garantida. A página carregará automaticamente assim que liberar.</p>
+            <p><strong>Não feche esta janela.</strong></p>
+
+        </div>
+    </main>
+</body>
+
+</html>
