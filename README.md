@@ -1,4 +1,5 @@
-<p align="center"> <img width="300" height="230" alt="Catalogo+" src="https://github.com/user-attachments/assets/38f01a77-f234-4406-b680-40a9acb494b7" /> </p>
+
+![Banner Catalogo+-100](https://github.com/user-attachments/assets/073d29af-c0f2-4842-99eb-8a38bbae4be1)
 
 ---
 
@@ -143,6 +144,7 @@ catalogo_plus/
 - Fontes: As fontes utilizadas nos templates (ex: Parisienne, Agenda) devem estar instaladas no Windows para que o InDesign as reconheça.
 
 ---
+![Banner Footer-100](https://github.com/user-attachments/assets/472d5c5d-9f73-4257-a31a-4809762eae6c)
 
 ---
 <p align="center">Desenvolvido por Yasmin Mamud</p>
