@@ -59,6 +59,27 @@ PDF_PATH = os.path.join(DATA_DIR, "output", "resultado.pdf")
 #-------------------------------------------------
 
 
+# FUNÇÃO DE LOG DE AÇÕES
+#-------------------------------------------------
+
+def registrar_acao(user_code, acao):
+    name = session.get("usuario")
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO historico (user_code, acao, data_hora, nome_usuario)
+            VALUES (%s, %s, NOW(), %s)
+        """
+        cursor.execute(query, (user_code, acao, name))
+        conn.commit()
+    except Exception as e:
+        print(f"Erro ao registrar ação: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+#-------------------------------------------------
 
 
 # ROUTES LOGIN/LOGOUT e SESSION
@@ -95,6 +116,7 @@ def login():
 
         session["user_id"] = user["id"]
         session["usuario"] = user["user"]
+        registrar_acao(session["user_id"], "Logou")
 
         flash("Login realizado com sucesso!", "sucesso")
         return redirect(url_for("index"))
@@ -132,6 +154,8 @@ def liberar_sessao():
     if SESSION_LOCK["user_id"] == session.get("user_id"):
         SESSION_LOCK["user_id"] = None
     return redirect(url_for("index"))
+
+
 
 #-------------------------------------------------
 
@@ -554,6 +578,7 @@ def gerar_planilha():
     script_to_run = escolher_script(want_capa, want_contracapa)
 
     sucesso = executar_indesign_with_jsx(script_to_run)
+    registrar_acao(session["user_id"], "Criou PDF: ".format(session.get("nome_arquivo_escolhido")))
 
     if sucesso:
         time.sleep(5)

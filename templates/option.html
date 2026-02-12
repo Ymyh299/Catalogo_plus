@@ -344,7 +344,7 @@
             z-index: 1;
         }
 
-        .logo,
+        .imgcapa .logo,
         .sublogo {
             position: absolute;
             background-size: contain;
@@ -355,18 +355,44 @@
 
         }
 
-        .logo {
-            width: 300px;
+        .imgcontracapa .logo,
+        .sublogo {
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .imgcapa .logo {
+            width: 80%;
             height: 60px;
             top: 5%;
             left: 50%;
             transform: translateX(-50%);
         }
 
-        .sublogo {
-            width: 300px;
-            height: 100px;
-            bottom: 5%;
+        .imgcontracapa .logo {
+            width: 80%;
+            height: 60px;
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .imgcapa .sublogo {
+            width: 80%;
+            height: 20%;
+            bottom: 1%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .imgcontracapa .sublogo {   
+            width: 80%;
+            height: 20%;
+            bottom: 30%;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -510,17 +536,11 @@
                 padding: 8px;
             }
 
-
-
-            .logo {
-                width: 40%;
-                top: 8%;
+            .imgcapa .logo {
+                top: 0%;
             }
 
-            .sublogo {
-                width: 35%;
-                bottom: 8%;
-            }
+
         }
 
         /* --- POPUP VISUALIZAR --- */
@@ -600,6 +620,7 @@
             width: 86px;
             height: 96px;
         }
+
         .preco {
             background-image: url('/static/images/preco.png');
             background-repeat: no-repeat;
@@ -655,6 +676,10 @@
             .imgexemple {
                 width: 85vw;
             }
+
+            .imgcapa .logo {
+                top: 0%;
+            }
         }
     </style>
 </head>
@@ -673,7 +698,7 @@
                     <div class="opcoes-container">
                         <p class="titopc">Opcionais</p>
                         <div class="opcoes">
-                            
+
 
                             <div class="capa">
                                 <p>Capa</p>
@@ -826,7 +851,7 @@
         </div>
     </div>
 
-    
+
 
     <script>
         // Variáveis globais
@@ -1055,9 +1080,9 @@
         elementos.formArquivo.addEventListener('submit', function (e) {
 
             const btnSalvar = document.getElementById("btn-salvar");
-            btnSalvar.classList.add("btn-loading"); 
-            elementos.btnCancelar.disabled = true; 
-            
+            btnSalvar.classList.add("btn-loading");
+            elementos.btnCancelar.disabled = true;
+
 
             if (!elementos.inputNomeArquivo.value.trim()) {
                 alert('Digite um nome para o arquivo');
