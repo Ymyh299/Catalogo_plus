@@ -13,6 +13,9 @@ import requests
 import mysql.connector
 import os
 from dotenv import load_dotenv
+import fitz
+import zipfile
+import io
 
 load_dotenv()
 
@@ -185,9 +188,11 @@ def visualizar():
 @login_required
 @check_session_queue
 def painel():
-    layout_escolhido = request.form.get('layout_escolhido')
-    print(f"Layout escolhido: {layout_escolhido}")
-    session['layout_escolhido'] = layout_escolhido
+    if request.method == "POST":
+        layout_recebido = request.form.get('layout_escolhido')
+        session['layout_escolhido'] = layout_recebido
+        print(f"Layout salvo na sessão: {layout_recebido}")
+            
     return render_template("painel.html", usuario=session["usuario"])
 
 
@@ -213,11 +218,13 @@ def opcoes():
 #-------------------------------------------------
 
 @app.route('/foto/<ref>')
+@login_required
 def foto(ref):
     caminho = f"C:/Users/Administrador/Documents/fotosref/{ref}.jpg"
     return send_file(caminho)
 
 @app.route('/resultado')
+@login_required
 def resultado():
     path = "C:\\Users\\Administrador\\Documents\\Sistemas\\PDFgenerator\\indesign\\output\\resultado.pdf"
     return send_file(path)
@@ -401,6 +408,7 @@ def clean_composition(text):
 #-------------------------------------------------
 
 @app.route("/gerar_planilha", methods=["POST"])
+@login_required
 def gerar_planilha():
     dados_json = request.form.get("dados_json")
 
@@ -578,10 +586,15 @@ def gerar_planilha():
         if os.path.exists(CSV_CONTRACAPA_PATH):
             os.remove(CSV_CONTRACAPA_PATH)
 
+    layout_nome = session.get('layout_escolhido')
+    config_path = os.path.join(DATA_DIR, "layout_config.txt")
+
+    with open(config_path, "w") as f:
+        f.write(f"{layout_nome}.indd")
     script_to_run = escolher_script(want_capa, want_contracapa)
 
     sucesso = executar_indesign_with_jsx(script_to_run)
-    registrar_acao(session["user_id"], "Criou PDF: ".format(session.get("nome_arquivo_escolhido")))
+    registrar_acao(session["user_id"], "Criou PDF")
 
     if sucesso:
         time.sleep(5)
@@ -607,6 +620,28 @@ def download_pdf():
         PDF_PATH,
         as_attachment=True,
         download_name=f"{nome}.pdf"
+    )
+
+@app.route('/baixar_fotos')
+@login_required
+def baixar_fotos():
+    path = r"C:\Users\Administrador\Documents\Sistemas\PDFgenerator\indesign\output\resultado.pdf"
+    memory_zip = io.BytesIO()
+    with zipfile.ZipFile(memory_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+        pdf_document = fitz.open(path)
+        for page_num in range(len(pdf_document)):
+            page = pdf_document.load_page(page_num)
+            pix = page.get_pixmap(dpi=75)
+            img_bytes = pix.tobytes("png")
+            nome_arquivo = session.get("nome_arquivo_escolhido", "pagina") + f"_{page_num + 1}.png"
+            
+            zf.writestr(nome_arquivo, img_bytes)
+    memory_zip.seek(0)
+    return send_file(
+        memory_zip,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name='fotos_do_pdf.zip'
     )
 
 #-------------------------------------------------

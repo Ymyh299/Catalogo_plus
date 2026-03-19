@@ -1,6 +1,14 @@
 var base = "C:/Users/Administrador/Documents/Sistemas/PDFgenerator/indesign";
 
-var TEMPLATE_PRODUTOS = File(base + "/template/template_produtos.indd");
+// Lê qual template deve ser usado
+var configFile = File(base + "/layout_config.txt");
+configFile.open('r');
+var nomeTemplate = configFile.read().replace(/\n|\r/g, ""); // Remove quebras de linha
+configFile.close();
+
+// Aplica o template dinamicamente
+var TEMPLATE_PRODUTOS = File(base + "/template/" + nomeTemplate);
+
 var TEMPLATE_CONTRA = File(base + "/template/template_contracapa.indd");
 
 var CSVPRODUTOS = File(base + "/CSV/data_merge_produto.csv");

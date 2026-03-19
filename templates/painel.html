@@ -277,11 +277,17 @@
 
         .item-counter {
             font-size: 10px;
-            /* Bem pequeno */
             color: #888;
-            /* Cinza discreto */
             font-family: sans-serif;
             margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .item-weight {
+            font-size: 10px;
+            color: #888;
+            font-family: sans-serif;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -462,7 +468,11 @@
                 </form>
 
                 <div class="refs-container">
-                    <div class="item-counter">Itens: <span id="count-number">0</span></div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 5px;">
+                        <div class="item-counter">Itens: <span id="count-number">0</span></div>
+                        <div class="item-weight">Peso: <span id="weight-number">0</span>mb</div>
+                    </div>
                     <ul></ul>
                 </div>
 
@@ -505,7 +515,8 @@
             popupSync: document.getElementById('popup-sync'),
             form: document.getElementById('form'),
             btnAdd: document.getElementById('btn-add'),
-            alertShown: false
+            alertShown: false,
+            itemWeight: document.getElementById('weight-number')
         };
 
         let timeoutId;
@@ -547,44 +558,74 @@
             }, 500);
         });
 
-        document.querySelector('.form-add').addEventListener('submit', function (e) {
+        document.querySelector('.form-add').addEventListener('submit', async function (e) {
             e.preventDefault();
             const rawValue = elementos.inputref.value.trim();
             if (!rawValue) return;
 
             const refsArray = rawValue.split(/[,\s]+/).filter(ref => ref.length > 0);
+            const erros = []; // Array para guardar as referências que falharem
 
-            refsArray.forEach(ref => {
-                const refUpper = ref.toUpperCase();
+            // Criamos uma lista de Promessas para cada referência
+            const promessas = refsArray.map(ref => {
+                return new Promise((resolve) => {
+                    const refUpper = ref.toUpperCase();
+                    const imagePath = `/foto/${refUpper}`;
+                    const testImage = new Image();
 
-                if (elementos.refsContainer.style.display === 'none' || elementos.refsContainer.style.display === '') {
-                    elementos.refsContainer.style.display = 'block';
-                }
+                    testImage.onload = function () {
+                        // Lógica de sucesso (adicionar na lista)
+                        if (elementos.refsContainer.style.display === 'none' || elementos.refsContainer.style.display === '') {
+                            elementos.refsContainer.style.display = 'block';
+                        }
 
-                const li = document.createElement('li');
-                const span = document.createElement('span');
-                span.textContent = refUpper;
+                        const li = document.createElement('li');
+                        const span = document.createElement('span');
+                        span.textContent = refUpper;
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.id = 'delete-btn';
-                deleteBtn.className = 'fa-solid fa-trash';
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.id = 'delete-btn';
+                        deleteBtn.className = 'fa-solid fa-trash';
 
-                deleteBtn.addEventListener('click', function () {
-                    li.remove();
-                    atualizarContador();
-                    if (elementos.refsList.children.length === 0) {
-                        elementos.refsContainer.style.display = 'none';
-                        limparImagens();
-                    }
+                        deleteBtn.addEventListener('click', function () {
+                            li.remove();
+                            atualizarContador();
+                            atualizarPeso();
+                            if (elementos.refsList.children.length === 0) {
+                                elementos.refsContainer.style.display = 'none';
+                                limparImagens();
+                            }
+                        });
+
+                        li.appendChild(span);
+                        li.appendChild(deleteBtn);
+                        elementos.refsList.appendChild(li);
+
+                        elementos.imgdiv.style.backgroundImage = `url(${imagePath})`;
+                        atualizarContador();
+                        atualizarPeso();
+                        resolve(); // Terminou com sucesso
+                    };
+
+                    testImage.onerror = function () {
+                        erros.push(refUpper); // Guarda o nome da ref que deu erro
+                        resolve(); // Terminou (mesmo com erro) para não travar o Promise.all
+                    };
+
+                    testImage.src = imagePath;
                 });
-
-                li.appendChild(span);
-                li.appendChild(deleteBtn);
-                elementos.refsList.appendChild(li);
-                carregarImagem(refUpper);
             });
 
-            atualizarContador();
+            // Espera todos os testes terminarem
+            await Promise.all(promessas);
+
+            // Se houver erros, mostra um único alerta consolidado
+            // Se houver erros, mostra um prompt para permitir copiar o texto
+            if (erros.length > 0) {
+                const msg = `As seguintes referências não foram encontradas:\n\n${erros.join(', ')}`;
+                // O prompt permite que o usuário selecione e copie o texto
+                prompt("⚠️ Referências não encontradas (Copie com Ctrl+C):", erros.join(', '));
+            }
             elementos.inputref.value = '';
             elementos.inputref.focus();
         });
@@ -607,6 +648,13 @@
                 elementos.contador.style.color = '';
                 elementos.alertShown = false;
             }
+        }
+
+        function atualizarPeso() {
+            if (!elementos.itemWeight || !elementos.refsList) return;
+            const count = elementos.refsList.children.length;
+            const totalWeight = (count * 0.8).toFixed(2);
+            elementos.itemWeight.innerText = totalWeight;
         }
 
         elementos.form.addEventListener('submit', function () {

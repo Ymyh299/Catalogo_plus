@@ -384,12 +384,12 @@
         .imgcapa .sublogo {
             width: 80%;
             height: 20%;
-            bottom: 1%;
+            bottom: 0%;
             left: 50%;
             transform: translateX(-50%);
         }
 
-        .imgcontracapa .sublogo {   
+        .imgcontracapa .sublogo {
             width: 80%;
             height: 20%;
             bottom: 30%;
@@ -581,7 +581,6 @@
         .imgexemple {
             width: 320px;
             aspect-ratio: 9 / 16;
-            background-image: url('/static/images/a5045.jpg');
             background-size: cover;
             background-position: center;
             border-radius: 8px;
@@ -826,34 +825,16 @@
             </button>
 
             <div class="imgexemple">
-                <div class="imgexemple-sup">
-                    <div class="ref-container">
-                        <div class="referencia" id="visu-ref" style="display: none;">
-                        </div>
-                    </div>
-                    <div class="preco-container">
-                        <div class="preco" id="visu-preco" style="display: none;">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="-visu-footer">
-                    <div class="comp-container">
-                        <div class="imgexemple-inf" id="visu-comp" style="display: none;">
-                        </div>
-                    </div>
-                    <div class="tam-container">
-                        <div class="tamanho-visu" id="visu-tam" style="display: none;">
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
+    </div>
     </div>
 
 
 
     <script>
+        const layoutPython = "{{ session.get('layout_escolhido', 'template_default') }}";
+
         // Variáveis globais
         const elementos = {
             checkCapa: document.getElementById("check-opc"),
@@ -878,16 +859,13 @@
             formArquivo: document.getElementById('form-arquivo'),
             inputNomeArquivo: document.getElementById('nome-arquivo'),
             popupVisualizar: document.getElementById('popup-visualizar'),
-            visuRef: document.getElementById('visu-ref'),
-            visuPreco: document.getElementById('visu-preco'),
-            visuComp: document.getElementById('visu-comp'),
-            visuTam: document.getElementById('visu-tam'),
+            imgExemple: document.querySelector('.imgexemple'), // Div onde a imagem vai aparecer
+
             checkRefInput: document.getElementById('iptreferencia'),
             checkPrecoInput: document.getElementById('iptpreco'),
             checkCompInput: document.getElementById('iptcomposicao'),
             checkTamInput: document.getElementById('ipttamanho'),
             btnCancelar: document.getElementById('btn-cancelar')
-
         };
 
         let timeoutId;
@@ -1022,7 +1000,7 @@
             }
         });
 
-        // POPUP
+        // POPUP - Botão Salvar
         document.querySelector('form').addEventListener('submit', function (e) {
             e.preventDefault();
             abrirPopup();
@@ -1038,55 +1016,44 @@
             elementos.inputNomeArquivo.value = '';
         }
 
-
-
+        // ============================================
+        // NOVA LÓGICA DE VISUALIZAR AQUI
+        // ============================================
         function abrirVisualizar() {
+            let combinacao = "";
 
-            if (elementos.checkRefInput.checked) {
-                elementos.visuRef.style.display = 'block';
-            } else {
-                elementos.visuRef.style.display = 'none';
-            }
+            if (elementos.checkRefInput.checked) combinacao += "1";
+            if (elementos.checkPrecoInput.checked) combinacao += "2";
+            if (elementos.checkCompInput.checked) combinacao += "3";
+            if (elementos.checkTamInput.checked) combinacao += "4";
 
-            if (elementos.checkPrecoInput.checked) {
-                elementos.visuPreco.style.display = 'block';
-            } else {
-                elementos.visuPreco.style.display = 'none';
-            }
+            const partesLayout = layoutPython.split('_');
+            const nomeLayout = partesLayout.length > 1 ? partesLayout[1] : layoutPython;
+            const caminhoImagem = `/static/images/${nomeLayout}_${combinacao}.jpg`;
 
-            if (elementos.checkCompInput.checked) {
-                elementos.visuComp.style.display = 'block';
-            } else {
-                elementos.visuComp.style.display = 'none';
-            }
-
-            if (elementos.checkTamInput.checked) {
-                elementos.visuTam.style.display = 'block';
-            } else {
-                elementos.visuTam.style.display = 'none';
-            }
-
+            elementos.imgExemple.style.backgroundImage = `url('${caminhoImagem}')`;
             elementos.popupVisualizar.style.display = 'flex';
+
         }
 
         function fecharPopupVisualizar() {
             elementos.popupVisualizar.style.display = 'none';
         }
-
-
-
-
+        // ============================================
 
         elementos.formArquivo.addEventListener('submit', function (e) {
-
             const btnSalvar = document.getElementById("btn-salvar");
             btnSalvar.classList.add("btn-loading");
             elementos.btnCancelar.disabled = true;
-
+            elementos.inputNomeArquivo.disabled = true;
 
             if (!elementos.inputNomeArquivo.value.trim()) {
                 alert('Digite um nome para o arquivo');
                 e.preventDefault();
+
+                // Em caso de erro, tira o loading para o usuário tentar novamente
+                btnSalvar.classList.remove("btn-loading");
+                elementos.btnCancelar.disabled = false;
                 return;
             }
             const dadosParaSalvar = {

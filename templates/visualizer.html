@@ -190,7 +190,7 @@
                 font-size: 18px;
             }
 
-            
+
         }
 
         @media (max-height: 600px) {
@@ -226,6 +226,9 @@
             <div class="pdf-container">
                 <div class="header-pdf">
                     <span>PDF Gerado</span>
+                    <button id="baixar-foto" class="baixar-foto">
+                        <i class="fa-solid fa-images"></i> Fotos
+                    </button>
                     <button id="baixar" class="baixar">
                         <i class="fa-solid fa-download"></i> Baixar
                     </button>
@@ -240,11 +243,60 @@
     </main>
 
     <script>
+        const baixar = document.getElementById('baixar');
+        const baixarFoto = document.getElementById('baixar-foto');
 
-        const baixar = document.getElementById('baixar')
+        // BOTÃO DE FOTOS
+        baixarFoto.addEventListener("click", async () => {
+            // Guarda como o botão era originalmente para podermos restaurar depois
+            const conteudoOriginal = baixarFoto.innerHTML;
 
+            try {
+                // 1. Altera o visual do botão e desativa os cliques
+                baixarFoto.disabled = true;
+                baixarFoto.style.cursor = "not-allowed"; // Muda a setinha do mouse
+                baixarFoto.style.opacity = "0.7"; // Deixa um pouco transparente
+                baixarFoto.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+
+                // 2. Faz o pedido para o servidor
+                const response = await fetch("/baixar_fotos");
+                if (!response.ok) throw new Error("Erro ao baixar fotos");
+
+                // 3. Processa e baixa o arquivo
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+
+                a.href = url;
+                a.download = "fotos_do_pdf.zip";
+
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+
+                window.URL.revokeObjectURL(url);
+                
+                const tempoLimite = 5 * 60 * 1000;
+                setTimeout(function () {
+                    window.location.href = "{{ url_for('liberar_sessao') }}";
+                }, tempoLimite);
+
+
+            } catch (err) {
+                console.error(err);
+                alert("⚠️ Não foi possível baixar as fotos.");
+            } finally {
+                // 4. O bloco 'finally' sempre executa no final, dando certo ou erro.
+                // Aqui nós restauramos o botão ao seu estado normal.
+                baixarFoto.disabled = false;
+                baixarFoto.style.cursor = "pointer";
+                baixarFoto.style.opacity = "1";
+                baixarFoto.innerHTML = conteudoOriginal;
+            }
+        });
+
+        // BOTÃO DO PDF
         baixar.addEventListener("click", async () => {
-
             try {
                 const response = await fetch("/download");
                 if (!response.ok) throw new Error("Erro ao baixar PDF");
@@ -253,24 +305,27 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
 
-                a.href = "/download";
+                // Corrigido igual ao de cima
+                a.href = url;
+                a.download = "resultado.pdf"; // Força o download
+
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
 
                 window.URL.revokeObjectURL(url);
 
+                const tempoLimite = 1 * 60 * 1000;
+                setTimeout(function () {
+                    window.location.href = "{{ url_for('liberar_sessao') }}";
+                }, tempoLimite);
+
             } catch (err) {
-                statusDiv.innerHTML = "⚠️ Não foi possível baixar o PDF.";
-                statusDiv.style.color = "#ffb400";
+                console.error(err);
+                alert("⚠️ Não foi possível baixar o PDF.");
             }
         });
 
-        const tempoLimite = 5 * 60 * 1000;
-
-        setTimeout(function () {
-            window.location.href = "{{ url_for('liberar_sessao') }}";
-        }, tempoLimite);
 
     </script>
 

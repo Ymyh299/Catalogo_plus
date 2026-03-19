@@ -209,6 +209,7 @@
                 font-size: 24px;
             }
         }
+
         @media (max-height: 650px) {
             .carousel-wrapper {
                 height: 55vh;
@@ -237,15 +238,14 @@
 
             <div class="carousel-wrapper" id="carouselWrapper">
                 <div class="carousel" id="carousel">
-                    <img src="/static/layouts/img1.png" alt="Layout 1" data-name="img1.png">
-                    <img src="/static/layouts/img2.png" alt="Layout 2" data-name="img2.png">
-                    <img src="/static/layouts/img3.png" alt="Layout 3" data-name="img3.png">
+                    <img src="/static/layouts/template_produtos.png" alt="Layout 1" data-name="template_produtos">
+                    <img src="/static/layouts/template_polaroid.png" alt="Layout 2" data-name="template_polaroid">
                 </div>
             </div>
 
             <div class="indicators" id="indicators"></div>
 
-            <form action="/painel">
+            <form action="/painel" method="POST">
                 <input type="hidden" name="layout_escolhido" id="layout-input">
                 <button class="escolher" type="submit">Usar este layout</button>
             </form>
