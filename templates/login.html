@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo+</title>
+    <title>Catálogo+</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
@@ -15,13 +15,17 @@
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* body e mais */
+        /* BASE */
         body {
             margin: 0;
             box-sizing: border-box;
             padding: 0;
+            font-family: 'Agenda', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
         }
-
 
         @font-face {
             font-family: 'Chetta';
@@ -37,306 +41,361 @@
             font-style: normal;
         }
 
-
-
-
-        /* MAIN */
-        main {
-            height: 100vh;
-            background-image: url("../static/images/fotofundo.jpg");
-            background-size: cover;
-            background-position: center;
+        * {
+            box-sizing: border-box;
         }
 
-        /* CONTAINER */
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            width: 60%;
-            padding: 0;
-            backdrop-filter: blur(6px);
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* HEADER DO CONTAINER */
-
-        .tit {
-            font-family: 'Chetta';
-            font-size: 43px;
-            margin: 0;
-            color: rgb(60, 60, 60);
-        }
-
+        /* HEADER GLOBAL */
         header {
             width: 100%;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            height: 40px;
-            padding-top: 10px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgb(255, 255, 255);
+            height: 55px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #e0e0e0;
+            backdrop-filter: blur(6px);
+            background-color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+            z-index: 10;
         }
 
-        /* LOGIN-CONTAINER */
-
-        .login-container {
-            width: 85%;
-            height: 100%;
+        .tit {
+            font-family: 'Chetta';
+            font-size: 38px;
+            margin: 0;
+            color: #333333;
         }
 
-        .login {
-            background-color: rgba(40, 40, 40, 0.5);
-            height: 220px;
-            width: 100%;
-            margin-top: 60px;
-            border-radius: 15px;
+        /* LAYOUT PRINCIPAL (SPLIT SCREEN) */
+        main {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+
+        /* PAINEL ESQUERDO (LOGIN) */
+        .painel-esquerdo {
+            width: 45%;
             display: flex;
             flex-direction: column;
+            position: relative;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
         }
 
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .login-container {
+            width: 80%;
+            max-width: 400px;
+        }
+
+        /* TÍTULO DA SEÇÃO */
         h2 {
-            font-family: 'Agenda';
-            color: white;
-            padding-left: 10px;
-            margin-bottom: 20px;
+            font-family: 'Chetta', serif;
+            color: #333333;
+            font-size: 28px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: normal;
         }
 
-
-        /* INPUTS */
-
+        /* INPUTS ESTILO CLEAN */
+        /* ESTRUTURA DOS INPUTS COM ANIMAÇÃO (FLOATING LABEL) */
         .inputs {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            gap: 20px;
+            /* Aumentei um pouco o gap para dar respiro aos rótulos */
         }
 
-        #username {
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
             background-color: transparent;
-            border-bottom: 1.5px solid white;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            width: 80%;
-            padding-bottom: 7px;
-            padding-left: 0px;
-            border-radius: 0;
-            color: white;
+            border: 1px solid #333333;
+            border-radius: 6px;
+            font-family: 'Agenda', sans-serif;
+            font-size: 14px;
+            color: #333333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        #username:focus {
+        .input-group input:focus {
             outline: none;
-            background-color: transparent;
-            border-bottom: 1.5px solid white;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            width: 80%;
-            padding-bottom: 7px;
-            padding-left: 0px;
-            border-radius: 0;
-            color: white;
+            border-color: #000000;
+            box-shadow: 0 0 0 1px #000000;
         }
 
-
-        #password {
-            margin-top: 30px;
-            background-color: transparent;
-            border-bottom: 1.5px solid white;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            width: 80%;
-            padding-bottom: 7px;
-            padding-left: 0px;
-            border-radius: 0;
-            color: white;
+        .input-group label {
+            position: absolute;
+            top: 14px;
+            left: 15px;
+            font-size: 12px;
+            color: #999999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            background-color: #ffffff;
+            padding: 0 4px;
         }
 
-        #password:focus {
-            outline: none;
-            background-color: transparent;
-            border-bottom: 1.5px solid white;
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            width: 80%;
-            padding-bottom: 7px;
-            padding-left: 0px;
-            border-radius: 0;
-            color: white;
+        .input-group input:focus~label,
+        .input-group input:not(:placeholder-shown)~label {
+            top: -8px;
+            left: 11px;
+            font-size: 10px;
+            color: #000000;
+            font-weight: 600;
         }
 
 
         ::-webkit-input-placeholder {
-            color: rgb(207, 207, 207);
-            font-size: 10px;
+            color: #999999;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
+        /* CHECKBOX LEMBRAR DE MIM */
         .lembrar {
             display: flex;
             align-items: center;
-            padding-left: 15px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .lembrar input[type="checkbox"] {
             appearance: none;
             -webkit-appearance: none;
-            -moz-appearance: none;
-            width: 12px;
-            height: 12px;
-            border: 1.5px solid #fff;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #333;
             border-radius: 3px;
             background: transparent;
             cursor: pointer;
             position: relative;
             vertical-align: middle;
-            transition: all 0.2s ease;
         }
 
-
         .lembrar input[type="checkbox"]:checked {
-            background-color: #fff;
+            background-color: #333;
         }
 
         .lembrar input[type="checkbox"]:checked::after {
             content: "";
             position: absolute;
-            left: 3.5px;
-            top: 0.5px;
-            width: 2px;
-            height: 6px;
-            border: solid #888;
+            left: 4px;
+            top: 1px;
+            width: 3px;
+            height: 7px;
+            border: solid #fff;
             border-width: 0 1.5px 1.5px 0;
             transform: rotate(45deg);
-            filter: invert(1);
         }
 
         .lembrar label {
-            color: #fff;
-            margin-left: 6px;
-            font-family: inherit;
+            color: #333333;
+            margin-left: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
             font-family: 'Agenda';
         }
 
-
-        /* Button */
+        /* BOTÃO ENTRAR */
+        .button {
+            margin-top: 30px;
+        }
 
         .entrar {
-            font-size: 20px;
+            font-size: 16px;
             font-family: 'Agenda';
-            font-weight: 700;
-            color: white;
+            font-weight: 600;
+            color: #ffffff;
             border: none;
-            background-color: rgba(40, 40, 40, 0.5);
+            background-color: #383838;
             width: 100%;
-            margin-top: 40px;
-            border-radius: 20px;
-            padding-top: 7px;
-            padding-bottom: 7px;
-
+            border-radius: 25px;
+            padding: 14px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        /* FOOTER */
+        .entrar:hover {
+            background-color: #1a1a1a;
+        }
 
+        /* FOOTER CONTATO */
         footer {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
+            padding: 20px 40px;
             font-family: 'Agenda';
-            margin-left: 40px;
+            border-top: 1px solid #f0f0f0;
         }
 
         .problema {
-            font-size: 15px;
-            color: rgb(60, 60, 60);
+            font-size: 14px;
+            color: #333333;
             margin: 0;
             font-weight: 600;
         }
 
         .ctt {
-            font-size: 13px;
-            color: rgb(60, 60, 60);
-            margin-top: 0;
-            margin-bottom: 0px;
+            font-size: 12px;
+            color: #666666;
+            margin-top: 2px;
+            margin-bottom: 5px;
         }
 
         .contato {
-            margin-top: 0;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .numero {
             display: flex;
             align-items: baseline;
-            gap: 2px;
-            color: rgb(60, 60, 60);
+            gap: 3px;
+            color: #333333;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
+        .numero:hover {
+            text-decoration: underline;
         }
 
         .ddd {
-            font-size: 13px;
+            font-size: 12px;
+            margin: 0;
         }
 
+        .ctd {
+            margin: 0;
+        }
 
+        /* PAINEL DIREITO (IMAGEM DE FUNDO) */
+        .painel-direito {
+            width: 55%;
+            background-image: url("../static/images/fotofundo.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        /* Subtom sutil (opcional) para combinar com a paleta da imagem 2 */
+        .painel-direito::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 235, 235, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
+            pointer-events: none;
+        }
+
+        /* RESPONSIVIDADE (MOBILE) */
+        @media (max-width: 800px) {
+            main {
+                flex-direction: column;
+            }
+
+            .painel-esquerdo {
+                width: 100%;
+                flex: 1;
+                /* Faz o painel de login preencher todo o espaço vertical disponível na tela */
+                border-right: none;
+            }
+
+            .login-container {
+                width: 90%;
+                /* Deixa o formulário um pouco mais largo no celular para facilitar o clique */
+            }
+
+            footer {
+                padding: 20px;
+                /* Reduz o espaçamento lateral no celular para não ficar espremido */
+            }
+
+            .painel-direito {
+                display: none;
+                /* Oculta a imagem no mobile para focar no login */
+            }
+        }
     </style>
 </head>
 
 <body>
 
+    <header>
+        <p class="tit">Catálogo+</p>
+    </header>
+
     <main>
-        <div class="container">
-
-            <header>
-                <p class="tit">Catálogo+</p>
-            </header>
-
-            <div class="login-container">
-                <form method="post">
-                    <div class="login">
+        <div class="painel-esquerdo">
+            <div class="login-wrapper">
+                <div class="login-container">
+                    <form method="post">
                         <h2>Acesse já!</h2>
 
                         <div class="inputs">
-                            <input type="text" placeholder="nome de usuário" id="username" name="username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            <input type="password" placeholder="senha" id="password" name="password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <div class="input-group">
+                                <input type="text" id="username" name="username" placeholder=" " autocomplete="off"
+                                    autocorrect="off" autocapitalize="off" spellcheck="false">
+                                <label for="username">Usuário</label>
+                            </div>
+
+                            <div class="input-group">
+                                <input type="password" id="password" name="password" placeholder=" " autocomplete="off"
+                                    autocorrect="off" autocapitalize="off" spellcheck="false">
+                                <label for="password">Senha</label>
+                            </div>
                         </div>
 
                         <div class="lembrar">
                             <input type="checkbox" name="lembrardemim" id="lembrar">
-                            <label for="lembrardemim">Lembrar de mim</label>
+                            <label for="lembrar">Lembrar de mim</label>
                         </div>
 
-                    </div>
-
-                    <div class="button">
-                        <button type="submit" class="entrar" id="entrar">Entrar</button>
-                    </div>
-                </form>
+                        <div class="button">
+                            <button type="submit" class="entrar" id="entrar">Entrar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <footer>
                 <p class="problema">Algum Problema?</p>
                 <p class="ctt">entre em contato:</p>
                 <div class="contato">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <a href="https://w.app/gxlxf8" class="numero">
+                    <i class="fa-brands fa-whatsapp" style="color: #333;"></i>
+                    <a href="https://wa.me/5535998078612?text=Suporte%20t%C3%A9cnico%20Catalogo+%20solicitado"
+                        class="numero">
                         <p class="ddd">35</p>
                         <p class="ctd">99807-8612</p>
                     </a>
                 </div>
-
             </footer>
-
         </div>
+
+        <div class="painel-direito"></div>
 
     </main>
 

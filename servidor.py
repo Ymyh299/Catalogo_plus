@@ -7,4 +7,4 @@ if __name__ == "__main__":
     print("O Túnel deve apontar para a porta: 8080")
     print("-------------------------------------------")
 
-    serve(app, host='0.0.0.0', port=8080, threads=12)
+    serve(app, host='0.0.0.0', port=8080, threads=32, connection_limit=1000)

@@ -70,7 +70,7 @@
             height: 55px;
             padding: 0 20px;
             box-sizing: border-box;
-            border-bottom: 2px solid rgb(60, 60, 60);
+            border-bottom: 1px solid #e0e0e0;
             backdrop-filter: blur(6px);
             background-color: rgba(255, 255, 255, 0.5);
             flex-shrink: 0;
@@ -741,6 +741,7 @@
                                     <select id="select-sublogo" disabled>
                                         <option value="sublogo_golden">Golden</option>
                                         <option value="sublogo_catarina">Catarina</option>
+                                        <option value="sublogo_prime">Prime</option>
                                     </select>
                                 </div>
                             </div>
@@ -859,7 +860,7 @@
             formArquivo: document.getElementById('form-arquivo'),
             inputNomeArquivo: document.getElementById('nome-arquivo'),
             popupVisualizar: document.getElementById('popup-visualizar'),
-            imgExemple: document.querySelector('.imgexemple'), // Div onde a imagem vai aparecer
+            imgExemple: document.querySelector('.imgexemple'),
 
             checkRefInput: document.getElementById('iptreferencia'),
             checkPrecoInput: document.getElementById('iptpreco'),
@@ -922,7 +923,6 @@
             });
         }
 
-        // Eventos
         elementos.checkCapa.addEventListener('change', () => {
             if (elementos.checkCapa.checked) {
                 elementos.conteudoCapa.style.display = "flex";
@@ -1000,7 +1000,6 @@
             }
         });
 
-        // POPUP - Botão Salvar
         document.querySelector('form').addEventListener('submit', function (e) {
             e.preventDefault();
             abrirPopup();
@@ -1016,9 +1015,6 @@
             elementos.inputNomeArquivo.value = '';
         }
 
-        // ============================================
-        // NOVA LÓGICA DE VISUALIZAR AQUI
-        // ============================================
         function abrirVisualizar() {
             let combinacao = "";
 
@@ -1039,23 +1035,18 @@
         function fecharPopupVisualizar() {
             elementos.popupVisualizar.style.display = 'none';
         }
-        // ============================================
 
-        elementos.formArquivo.addEventListener('submit', function (e) {
+
+        elementos.formArquivo.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
             const btnSalvar = document.getElementById("btn-salvar");
-            btnSalvar.classList.add("btn-loading");
-            elementos.btnCancelar.disabled = true;
-            elementos.inputNomeArquivo.disabled = true;
 
             if (!elementos.inputNomeArquivo.value.trim()) {
                 alert('Digite um nome para o arquivo');
-                e.preventDefault();
-
-                // Em caso de erro, tira o loading para o usuário tentar novamente
-                btnSalvar.classList.remove("btn-loading");
-                elementos.btnCancelar.disabled = false;
                 return;
             }
+
             const dadosParaSalvar = {
                 nomeArquivo: elementos.inputNomeArquivo.value,
                 referencia: elementos.checkReferencia.checked,
@@ -1070,7 +1061,33 @@
                 logoescolhida: elementos.selectLogo.value,
                 sublogoescolhida: elementos.selectSublogo.value
             };
-            document.getElementById("dados-json").value = JSON.stringify(dadosParaSalvar);
+
+
+            btnSalvar.classList.add("btn-loading");
+            elementos.btnCancelar.disabled = true;
+            elementos.inputNomeArquivo.disabled = true;
+
+
+            const formData = new FormData();
+            formData.append("dados_json", JSON.stringify(dadosParaSalvar));
+
+            const resp = await fetch("/gerar_planilha", { method: "POST", body: formData });
+            const { job_id } = await resp.json();
+
+
+            const intervalo = setInterval(async () => {
+                const statusResp = await fetch(`/status_job/${job_id}`);
+                const { status } = await statusResp.json();
+
+                if (status === "ok") {
+                    clearInterval(intervalo);
+                    window.location.href = "/visualizar";
+                } else if (status === "erro") {
+                    clearInterval(intervalo);
+                    window.location.href = "/liberar_sessao";
+                }
+
+            }, 5000);
         });
 
         document.querySelector('#form-arquivo button[type="button"]').addEventListener('click', fecharPopup);

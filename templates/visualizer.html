@@ -59,7 +59,7 @@
             height: 55px;
             padding: 0 20px;
             box-sizing: border-box;
-            border-bottom: 2px solid rgb(60, 60, 60);
+            border-bottom: 1px solid #e0e0e0;
             backdrop-filter: blur(6px);
             background-color: rgba(255, 255, 255, 0.5);
             flex-shrink: 0;
@@ -246,23 +246,21 @@
         const baixar = document.getElementById('baixar');
         const baixarFoto = document.getElementById('baixar-foto');
 
-        // BOTÃO DE FOTOS
+        
         baixarFoto.addEventListener("click", async () => {
-            // Guarda como o botão era originalmente para podermos restaurar depois
             const conteudoOriginal = baixarFoto.innerHTML;
 
             try {
-                // 1. Altera o visual do botão e desativa os cliques
+                
                 baixarFoto.disabled = true;
-                baixarFoto.style.cursor = "not-allowed"; // Muda a setinha do mouse
-                baixarFoto.style.opacity = "0.7"; // Deixa um pouco transparente
+                baixarFoto.style.cursor = "not-allowed";
+                baixarFoto.style.opacity = "0.7";
                 baixarFoto.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
 
-                // 2. Faz o pedido para o servidor
                 const response = await fetch("/baixar_fotos");
                 if (!response.ok) throw new Error("Erro ao baixar fotos");
 
-                // 3. Processa e baixa o arquivo
+                
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
@@ -276,7 +274,7 @@
 
                 window.URL.revokeObjectURL(url);
                 
-                const tempoLimite = 5 * 60 * 1000;
+                const tempoLimite = 5 * 60 * 5000;
                 setTimeout(function () {
                     window.location.href = "{{ url_for('liberar_sessao') }}";
                 }, tempoLimite);
@@ -286,8 +284,7 @@
                 console.error(err);
                 alert("⚠️ Não foi possível baixar as fotos.");
             } finally {
-                // 4. O bloco 'finally' sempre executa no final, dando certo ou erro.
-                // Aqui nós restauramos o botão ao seu estado normal.
+
                 baixarFoto.disabled = false;
                 baixarFoto.style.cursor = "pointer";
                 baixarFoto.style.opacity = "1";
@@ -295,7 +292,7 @@
             }
         });
 
-        // BOTÃO DO PDF
+
         baixar.addEventListener("click", async () => {
             try {
                 const response = await fetch("/download");
@@ -304,18 +301,14 @@
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement("a");
-
-                // Corrigido igual ao de cima
-                a.href = url;
-                a.download = "resultado.pdf"; // Força o download
-
+                a.href = "/download";
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
 
                 window.URL.revokeObjectURL(url);
 
-                const tempoLimite = 1 * 60 * 1000;
+                const tempoLimite = 1 * 60 * 5000;
                 setTimeout(function () {
                     window.location.href = "{{ url_for('liberar_sessao') }}";
                 }, tempoLimite);

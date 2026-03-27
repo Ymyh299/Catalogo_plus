@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 import fitz
 import zipfile
 import io
+import threading
+import uuid as uuid_lib
 
 load_dotenv()
 
@@ -159,6 +161,7 @@ def check_session_queue(f):
 def liberar_sessao():
     if SESSION_LOCK["user_id"] == session.get("user_id"):
         SESSION_LOCK["user_id"] = None
+    print(f"🔓 Sessão liberada pelo usuário {session.get('usuario')}")
     return redirect(url_for("index"))
 
 
@@ -314,7 +317,7 @@ def worker_atualizar_ref(code):
         if linhas_afetadas > 0:
             print(f"✅ {code} (Slug: {slug_db}) atualizado com sucesso!")
         else:
-            print(f"⚠️ {code} processado, mas banco não reportou mudanças (talvez dados iguais).")
+            print(f"🔄️ {code} processado, mas banco não reportou mudanças (talvez dados iguais).")
             
         return True
 
@@ -399,56 +402,25 @@ def clean_composition(text):
     text = text.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ')
     return text
 
-#-------------------------------------------------
-
-
-
-
-# ROUTES PRINCIPAIS DE GERAÇÃO
-#-------------------------------------------------
-
-@app.route("/gerar_planilha", methods=["POST"])
-@login_required
-def gerar_planilha():
-    dados_json = request.form.get("dados_json")
-
-    if not dados_json:
-        return jsonify({"erro": "dados_json não enviado."}), 400
-
-    try:
-        dados_form = json.loads(dados_json)
-    except Exception as e:
-        return jsonify({"erro": "dados_json inválido.", "detalhe": str(e)}), 400
-
-    session["nome_arquivo_escolhido"] = dados_form.get("nomeArquivo", "arquivo")
-    referencias = session.get("referencias")
+def processar_geracao(dados_form, session_data):
+    referencias = session_data.get("referencias")
     if not referencias:
-        return jsonify({"erro": "Nenhuma referência salva na sessão."}), 400
+        return False
 
     if isinstance(referencias, str):
         if "," in referencias:
             referencias = [r.strip() for r in referencias.split(",") if r.strip()]
         else:
             referencias = [r.strip() for r in referencias.split() if r.strip()]
-    elif isinstance(referencias, list):
-        pass
-    else:
-        try:
-            referencias = json.loads(referencias)
-            if not isinstance(referencias, list): raise ValueError
-        except Exception:
-            return jsonify({"erro": "Formato de referências inválido."}), 400
 
     conn = mysql.connector.connect(**DB_CONFIG)
     cursor = conn.cursor(buffered=True)
 
     query = """
         SELECT name, price, promotional, price_promotional, composition, sizes
-        FROM products
-        WHERE code = %s
+        FROM products WHERE code = %s
     """
 
-    lista_produtos = []
     want_referencia = bool(dados_form.get("referencia", False))
     want_preco = bool(dados_form.get("preco", False))
     want_composicao = bool(dados_form.get("composicao", False))
@@ -461,22 +433,21 @@ def gerar_planilha():
     logo_escolhida = dados_form.get("logoescolhida", "")
     sublogo_escolhida = dados_form.get("sublogoescolhida", "")
 
+    lista_produtos = []
     for ref in referencias:
         cursor.execute(query, (ref,))
         result = cursor.fetchone()
         if not result: continue
 
         name, price, promotional, price_promotional, composition, sizes_raw = result
+        tms = {t: "" for t in ["pp", "p", "m", "g", "gg", "u"]}
+        pre = {t: "" for t in ["pp", "p", "m", "g", "gg", "u"]}
 
-        tms = {f"{t}": "" for t in ["pp", "p", "m", "g", "gg", "u"]}
-        pre = {f"{t}": "" for t in ["pp", "p", "m", "g", "gg", "u"]}
-        
         if want_tamanho:
             texto_tamanho = "Tamanhos disponíveis:"
             circulo = "O"
             fixed_pp, fixed_p, fixed_m = "PP", "P", "M"
             fixed_g, fixed_gg, fixed_u = "G", "GG", "U"
-            
             if sizes_raw:
                 lista_tamanhos_db = [s.strip().upper() for s in sizes_raw.split(",")]
                 for tam in tms.keys():
@@ -486,7 +457,6 @@ def gerar_planilha():
         else:
             texto_tamanho = circulo = ""
             fixed_pp = fixed_p = fixed_m = fixed_g = fixed_gg = fixed_u = ""
-
 
         if want_preco:
             if promotional == 1:
@@ -502,107 +472,136 @@ def gerar_planilha():
             comp = (comp_bruta[:28] + "+") if len(comp_bruta) > 28 else comp_bruta
 
         foto_path = rf"C:\Users\Administrador\Documents\fotosref\{ref}.jpg"
-
-        linha_produto = {
+        lista_produtos.append({
             "referencia": ref if want_referencia else "",
             "nome": name if want_referencia else "",
-            "de_ou_por": de_ou_por,
-            "preco_original": preco_original,
-            "traco": traco,
-            "por": por,
-            "real": real,
-            "realfixo": realfixo,
-            "preco_promocional": preco_promocional,
-            "composicao": comp,
-            "texto_tamanho": texto_tamanho, 
-            "circulo": circulo,             
-            "fixed_pp": fixed_pp,           
-            "tamanho PP": tms["pp"],        
-            "preenchimento PP": pre["pp"],  
-            "fixed_p": fixed_p,             
-            "tamanho P": tms["p"],          
-            "preenchimento P": pre["p"],    
-            "fixed_m": fixed_m,             
-            "tamanho M": tms["m"],          
-            "preenchimento M": pre["m"],    
-            "fixed_g": fixed_g,             
-            "tamanho G": tms["g"],          
-            "preenchimento G": pre["g"],    
-            "fixed_gg": fixed_gg,           
-            "tamanho GG": tms["gg"],        
-            "preenchimento GG": pre["gg"],  
-            "fixed_u": fixed_u,             
-            "tamanho U": tms["u"],          
-            "preenchimento U": pre["u"],    
-            "@fotos": foto_path             
-        }
-        lista_produtos.append(linha_produto)
+            "de_ou_por": de_ou_por, "preco_original": preco_original,
+            "traco": traco, "por": por, "real": real, "realfixo": realfixo,
+            "preco_promocional": preco_promocional, "composicao": comp,
+            "texto_tamanho": texto_tamanho, "circulo": circulo,
+            "fixed_pp": fixed_pp, "tamanho PP": tms["pp"], "preenchimento PP": pre["pp"],
+            "fixed_p": fixed_p, "tamanho P": tms["p"], "preenchimento P": pre["p"],
+            "fixed_m": fixed_m, "tamanho M": tms["m"], "preenchimento M": pre["m"],
+            "fixed_g": fixed_g, "tamanho G": tms["g"], "preenchimento G": pre["g"],
+            "fixed_gg": fixed_gg, "tamanho GG": tms["gg"], "preenchimento GG": pre["gg"],
+            "fixed_u": fixed_u, "tamanho U": tms["u"], "preenchimento U": pre["u"],
+            "@fotos": foto_path
+        })
 
     cursor.close()
     conn.close()
 
     if not lista_produtos:
-        return jsonify({"erro": "Nenhuma referência encontrada."}), 404
+        return False
 
-    df_produtos = pd.DataFrame(lista_produtos)
-    
     col_order = [
-        "referencia", "nome", "de_ou_por", "preco_original", "traco", "por", "real", "realfixo", "preco_promocional", "composicao",
-        "texto_tamanho", "circulo", 
+        "referencia", "nome", "de_ou_por", "preco_original", "traco", "por", "real", "realfixo",
+        "preco_promocional", "composicao", "texto_tamanho", "circulo",
         "fixed_pp", "tamanho PP", "preenchimento PP",
         "fixed_p", "tamanho P", "preenchimento P",
         "fixed_m", "tamanho M", "preenchimento M",
         "fixed_g", "tamanho G", "preenchimento G",
         "fixed_gg", "tamanho GG", "preenchimento GG",
-        "fixed_u", "tamanho U", "preenchimento U",
-        "@fotos"
+        "fixed_u", "tamanho U", "preenchimento U", "@fotos"
     ]
-    
-    df_produtos = df_produtos.reindex(columns=col_order)
-    df_produtos.to_csv(CSV_PRODUTO_PATH, index=False, sep=";", encoding="utf-16")
+    pd.DataFrame(lista_produtos).reindex(columns=col_order).to_csv(
+        CSV_PRODUTO_PATH, index=False, sep=";", encoding="utf-16"
+    )
 
-
+    # Capa
     if want_capa:
-        linha_capa = {
+        pd.DataFrame([{
             "@fotofundo": rf"C:\Users\Administrador\Documents\fotosref\{referencia_capa_val}.jpg" if referencia_capa_val else "",
             "@logo": rf"C:\Users\Administrador\Documents\Sistemas\PDFgenerator\static\logos\{logo_escolhida}.png" if want_logo and logo_escolhida else "",
             "@sublogo": rf"C:\Users\Administrador\Documents\Sistemas\PDFgenerator\static\logos\{sublogo_escolhida}.png" if want_sublogo and sublogo_escolhida else ""
-        }
-        df_capa = pd.DataFrame([linha_capa])
-        df_capa.to_csv(CSV_CAPA_PATH, index=False, sep=",", encoding="utf-16")
-    else:
-        if os.path.exists(CSV_CAPA_PATH):
-            os.remove(CSV_CAPA_PATH)
+        }]).to_csv(CSV_CAPA_PATH, index=False, sep=",", encoding="utf-16")
+    elif os.path.exists(CSV_CAPA_PATH):
+        os.remove(CSV_CAPA_PATH)
 
+    # Contracapa
     if want_contracapa:
-        linha_contracapa = {
+        pd.DataFrame([{
             "@fotofundo": rf"C:\Users\Administrador\Documents\fotosref\{referencia_capa_val}.jpg" if referencia_capa_val else "",
             "@logo": rf"C:\Users\Administrador\Documents\Sistemas\PDFgenerator\static\logos\{logo_escolhida}.png" if want_logo and logo_escolhida else "",
             "@sublogo": rf"C:\Users\Administrador\Documents\Sistemas\PDFgenerator\static\logos\{sublogo_escolhida}.png" if want_sublogo and sublogo_escolhida else ""
-        }
-        df_contra = pd.DataFrame([linha_contracapa])
-        df_contra.to_csv(CSV_CONTRACAPA_PATH, index=False, sep=",", encoding="utf-16")
-    else:
-        if os.path.exists(CSV_CONTRACAPA_PATH):
-            os.remove(CSV_CONTRACAPA_PATH)
+        }]).to_csv(CSV_CONTRACAPA_PATH, index=False, sep=",", encoding="utf-16")
+    elif os.path.exists(CSV_CONTRACAPA_PATH):
+        os.remove(CSV_CONTRACAPA_PATH)
 
-    layout_nome = session.get('layout_escolhido')
-    config_path = os.path.join(DATA_DIR, "layout_config.txt")
+    # Layout e InDesign
+    with open(os.path.join(DATA_DIR, "layout_config.txt"), "w") as f:
+        f.write(f"{session_data.get('layout_escolhido')}.indd")
 
-    with open(config_path, "w") as f:
-        f.write(f"{layout_nome}.indd")
-    script_to_run = escolher_script(want_capa, want_contracapa)
-
-    sucesso = executar_indesign_with_jsx(script_to_run)
-    registrar_acao(session["user_id"], "Criou PDF")
-
-    if sucesso:
-        time.sleep(5)
-        return redirect(url_for('visualizar'))
-    else:
-        flash("Ocorreu um erro crítico no InDesign ou Timeout. O processo foi reiniciado por segurança.", "erro")
-        return redirect(url_for('liberar_sessao'))
+    sucesso = executar_indesign_with_jsx(escolher_script(want_capa, want_contracapa))
     
+    try:
+        conn2 = mysql.connector.connect(**DB_CONFIG)
+        cursor2 = conn2.cursor()
+        cursor2.execute(
+            "INSERT INTO historico (user_code, acao, data_hora, nome_usuario) VALUES (%s, %s, NOW(), %s)",
+            (session_data["user_id"], "Criou PDF", session_data["usuario"])
+        )
+        conn2.commit()
+        cursor2.close()
+        conn2.close()
+    except Exception as e:
+        print(f"Erro ao registrar ação: {e}")
+
+    return sucesso
+
+JOBS = {}
+#-------------------------------------------------
+
+
+
+
+# ROUTES PRINCIPAIS DE GERAÇÃO
+#-------------------------------------------------
+
+
+@app.route("/gerar_planilha", methods=["POST"])
+@login_required
+@check_session_queue
+def gerar_planilha():
+    dados_json = request.form.get("dados_json")
+    if not dados_json:
+        return jsonify({"erro": "dados_json não enviado."}), 400
+
+    try:
+        dados_form = json.loads(dados_json)
+    except Exception as e:
+        return jsonify({"erro": "dados_json inválido.", "detalhe": str(e)}), 400
+
+    job_id = str(uuid_lib.uuid4())
+    JOBS[job_id] = {"status": "rodando"}
+
+    session_data = {
+        "user_id": session.get("user_id"),
+        "usuario": session.get("usuario"),
+        "referencias": session.get("referencias"),
+        "layout_escolhido": session.get("layout_escolhido"),
+        "nome_arquivo_escolhido": dados_form.get("nomeArquivo", "arquivo"),
+    }
+
+    def rodar_job():
+        try:
+            resultado = processar_geracao(dados_form, session_data)
+            JOBS[job_id]["status"] = "ok" if resultado else "erro"
+        except Exception as e:
+            print(f"Erro no job: {e}")
+            JOBS[job_id]["status"] = "erro"
+
+    threading.Thread(target=rodar_job, daemon=True).start()
+    return jsonify({"job_id": job_id})
+
+
+@app.route("/status_job/<job_id>")
+@login_required
+def status_job(job_id):
+    job = JOBS.get(job_id)
+    if not job:
+        return jsonify({"status": "não encontrado"}), 404
+    return jsonify(job)
 
 
 @app.route("/download")
