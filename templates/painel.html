@@ -569,7 +569,7 @@
                 await Promise.all(promessas)
             }
             if (erros.length > 0) {
-                prompt("⚠️ Referências não encontradas (Copie com Ctrl+C):", erros.join(', '));
+                prompt("⚠️ Referências não possuem fotos, enviar para Yasmin (Copie com Ctrl+C):", erros.join(', '));
             }
             elementos.inputref.value = '';
             elementos.inputref.focus();

@@ -1,4 +1,5 @@
 .env
+credentials.json
 teste.py
 __pycache__/
 *.pyc

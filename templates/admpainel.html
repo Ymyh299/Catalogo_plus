@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo+</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            margin: 0;
+            box-sizing: border-box;
+            padding: 0;
+            font-family: 'Agenda', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        @font-face {
+            font-family: 'Chetta';
+            src: url("../static/fonts/chettavissto/ChettaVissto.woff");
+        }
+
+        @font-face {
+            font-family: 'Agenda';
+            src: url("../static/fonts/agenda/agenda-light.ttf");
+        }
+
+        @font-face {
+            font-family: 'Agenda Bold';
+            src: url("../static/fonts/agenda/agenda-bold.ttf");
+        }
+
+        main {
+            height: 100vh;
+            background-image: url("../static/images/background.png");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 55px;
+            padding: 0 20px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #e0e0e0;
+            backdrop-filter: blur(6px);
+            background-color: rgba(255, 255, 255, 0.5);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .tit {
+            font-family: 'Chetta';
+            font-size: 30px;
+            margin: 0;
+            color: rgb(60, 60, 60);
+        }
+
+        header a {
+            text-decoration: none;
+            color: rgb(60, 60, 60);
+            font-size: 25px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 55px);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .first-container {
+            width: 50%;
+            min-width: 160px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 5;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+
+        .titulo p {
+            font-family: 'Chetta';
+            font-size: 30px;
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        .btn-secundario {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #333;
+            background-color: #fff;
+            color: #333;
+            border-radius: 25px;
+            font-family: 'Agenda Bold';
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-secundario:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .list-container {
+            width: 90%;
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            display: flex;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        .list-container ul {
+            width: 100%;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list-container li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+            font-family: 'Agenda';
+            font-size: 14px;
+            color: #333;
+            background-color: #fff;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            gap: 5px;
+        }
+
+        .list-container li span {
+            font-weight: bold;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 20px;
+            font-family: "Agenda";
+        }
+
+        .btn-principal {
+            width: 100%;
+            padding: 12px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-family: 'Agenda Bold';
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-principal:hover {
+            transform: translateY(-1px);
+        }
+
+        .second-container {
+            flex: 1;
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: transparent;
+            overflow: hidden;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: monospace;
+            height: 200px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .close-visu {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #c4c4c4;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(60, 60, 60, 0.3);
+        }
+
+        .popup-logs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .logs-container {
+            width: 500px;
+            min-height: 100px;
+            max-height: 100px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 5px;
+        }
+
+        .popup-newuser {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .newuser-container {
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow-y: auto;
+        }
+
+        .popup-history {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .history-container {
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow-y: auto;
+        }
+
+        .popup-edit {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .edit-container {
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .logs-div {
+            display: flex;
+            flex-direction: column;
+            align-items: baseline;
+            justify-content: center;
+            gap: 20px;
+            background-color: rgba(255, 255, 255, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            width: auto;
+            min-width: 250px;
+            max-width: 90%;
+            padding: 25px 40px;
+        }
+
+        .logs-div h2 {
+            font-family: 'Agenda Bold', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logs-div-tit {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            justify-content: end;
+        }
+
+        .logs-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .newuser-div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background-color: rgb(255, 255, 255);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            width: auto;
+            min-width: 250px;
+            max-width: 90%;
+            padding: 25px 40px;
+        }
+
+        .newuser-div h2 {
+            font-family: 'Agenda Bold', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .newuser-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            background-color: transparent;
+            border: 1px solid #333333;
+            border-radius: 6px;
+            font-family: 'Agenda', sans-serif;
+            font-size: 14px;
+            color: #333333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 1px #000000;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 14px;
+            left: 15px;
+            font-size: 12px;
+            color: #999999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            transition: all 0.2s ease-out;
+            background-color: #ffffff;
+            padding: 0 4px;
+        }
+
+        .input-group input:focus~label,
+        .input-group input:not(:placeholder-shown)~label {
+            top: -8px;
+            left: 11px;
+            font-size: 10px;
+            color: #000000;
+            font-weight: 600;
+        }
+
+
+        ::-webkit-input-placeholder {
+            color: #999999;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+
+        .history-div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            width: auto;
+            min-width: 250px;
+            max-width: 90%;
+            padding: 25px 40px;
+        }
+
+        .history-div h2 {
+            font-family: 'Agenda Bold', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .history-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .edit-div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background-color: rgba(255, 255, 255, 1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            width: auto;
+            min-width: 250px;
+            max-width: 90%;
+            padding: 25px 40px;
+        }
+
+        .edit-div h2 {
+            font-family: 'Agenda Bold', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .edit-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .header-cadastro {
+            margin-top: 20px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 5px;
+        }
+
+        .header-cadastro p {
+            font-family: 'Agenda Bold';
+            font-size: 25px;
+            color: #333;
+        }
+
+        .button-cadastro {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-verifica {
+            margin-top: 50px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 5px;
+        }
+
+        .header-verifica p {
+            font-family: 'Agenda Bold';
+            font-size: 25px;
+            color: #333;
+        }
+
+        .button-verifica {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-users {
+            width: 90%;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 5px;
+        }
+
+        .header-users p {
+            font-family: 'Agenda Bold';
+            font-size: 25px;
+            color: #333;
+        }
+
+        .buttons-list {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <a href="/liberar_sessao" class="fa-solid fa-arrow-left"></a>
+            <p class="tit">Catálogo+</p>
+            <a href="/liberar_sessao" class="fa-solid fa-house"></a>
+        </header>
+
+        <div class="container">
+
+            <div class="first-container">
+                <div class="titulo">
+                    <p>Painel Administrativo</p>
+                </div>
+
+                <form class="form-cadastro" action="/cadastrarproduto" method="post">
+                    <div class="header-cadastro">
+                        <p>Cadastro</p>
+                        <div id="select">
+                            <select class="btn-secundario" id="select-cadastro"
+                                style="padding: 5px; border-radius: 10px;">
+                                <option value="slug">SLUG</option>
+                                <option value="id">ID</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="main-cadastro">
+                        <textarea name="cadastrar" id="cadastrar"></textarea>
+                    </div>
+
+                    <div class="button-cadastro">
+                        <button type="submit" id="btn-cadastrar" class="btn-principal">Cadastrar</button>
+                        <button id="logs_cadastro" class="btn-secundario" style="width: 50%;">logs</button>
+                    </div>
+                </form>
+
+                <form class="form-verifica" action="/verificaproduto" method="post">
+                    <div class="header-verifica">
+                        <p>Verificar Lista</p>
+                        <div id="select">
+                            <select class="btn-secundario" id="select-verifica"
+                                style="padding: 5px; border-radius: 10px;">
+                                <option value="slug">SLUG</option>
+                                <option value="id">ID</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="main-verifica">
+                        <textarea name="verificar" id="verificar"></textarea>
+                    </div>
+
+                    <div class="button-verifica">
+                        <button type="submit" id="btn-verificar" class="btn-principal">Verificar</button>
+                        <button type="button" id="logs_verifica" class="btn-secundario"
+                            style="width: 50%;">logs</button>
+                    </div>
+                    <input type="hidden" name="tipo_verifica" id="tipo_verifica" value="slug">
+                </form>
+
+            </div>
+
+            <div class="second-container">
+                <div class="header-users">
+                    <p>Usuários</p>
+                    <button id="add_user" class="btn-secundario"
+                        style="border-radius: 12px; width: fit-content; padding-right: 12px; padding-left: 12px;">
+                        <i class="fa-solid fa-add"></i> &nbsp NOVO USUÁRIO
+                    </button>
+                </div>
+
+                <div class="list-container" style="display: flex;">
+                    <ul id="lista-usuarios"></ul>
+                </div>
+            </div>
+
+
+    </main>
+
+    <div class="popup-logs" id="popup-logs" style="display: none;">
+        <button type="button" class="close-visu" onclick="fecharPopupVisualizar()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="logs-div">
+            <div class="logs-div-tit">
+                <h2>logs</h2>
+                <div class="logs-icon">
+                    <i class="fa-solid fa-code"></i>
+                </div>
+            </div>
+            <div class="logs-container">
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-logs" id="popup-logs-verifica" style="display: none;">
+        <button type="button" class="close-visu" onclick="fecharPopupLogsVerifica()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="logs-div">
+            <h2>logs verificação</h2>
+            <div class="logs-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <div class="logs-container"></div>
+        </div>
+    </div>
+
+    <div class="popup-newuser" id="popup-newuser" style="display: none;">
+        <button type="button" class="close-visu" onclick="fecharTodosPopups()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="newuser-div" style="flex-direction: column; gap: 15px;">
+            <h2>Criar novo usuário</h2>
+            <div class="input-group">
+                <input type="text" id="newusername" placeholder=" " autocomplete="off">
+                <label>Usuário</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="new-password" placeholder=" " autocomplete="off">
+                <label>Senha</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="new-confirm-password" placeholder=" " autocomplete="off">
+                <label>Confirmar Senha</label>
+            </div>
+            <span id="erro-newuser" style="color:red; font-size:13px; display:none;"></span>
+            <button class="btn-principal" onclick="salvarNovoUsuario()">Cadastrar</button>
+        </div>
+    </div>
+
+    <div class="popup-history" id="popup-history" style="display: none;">
+        <button type="button" class="close-visu" onclick="fecharTodosPopups()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="history-div" style="flex-direction: column; gap: 15px; min-width: 350px;">
+            <h2 id="history-titulo">Histórico</h2>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <select id="select-dias" class="btn-secundario" style="border-radius: 10px; padding: 5px; width: auto;"
+                    onchange="carregarHistorico()">
+                    <option value="hoje">Hoje</option>
+                    <option value="15dias">Últimos 15 dias</option>
+                </select>
+            </div>
+            <div class="history-container"
+                style="max-height: 300px; min-width: 300px; display:flex; flex-direction:column; gap:4px;">
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-edit" id="popup-edit" style="display: none;">
+        <button type="button" class="close-visu" onclick="fecharTodosPopups()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="edit-div" style="flex-direction: column; gap: 15px;">
+            <h2 id="edit-titulo">Editar Usuário</h2>
+            <input type="hidden" id="edit-user-id">
+            <div class="input-group">
+                <input type="text" id="edit-username" placeholder=" " disabled>
+                <label>Usuário</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="edit-newpassword" placeholder=" " autocomplete="off">
+                <label>Nova Senha</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="edit-confirm-newpassword" placeholder=" " autocomplete="off">
+                <label>Confirmar Nova Senha</label>
+            </div>
+            <span id="erro-edit" style="color:red; font-size:13px; display:none;"></span>
+            <button class="btn-principal" onclick="salvarEdicaoUsuario()">Salvar</button>
+            <button class="btn-secundario" onclick="excluirUsuario()" style="border-color: #c00; color: #c00;">⚠️
+                Excluir conta</button>
+        </div>
+    </div>
+
+    <script>
+    let historyUserId = null;
+
+    function fecharTodosPopups() {
+        document.querySelectorAll('.popup-logs, .popup-newuser, .popup-history, .popup-edit')
+            .forEach(p => p.style.display = 'none');
+        clearInterval(pollInterval);
+        clearInterval(pollVerificaInterval);
+    }
+
+    // ─── USUÁRIOS ───────────────────────────────────────────
+
+    async function carregarUsuarios() {
+        const res = await fetch('/listar_usuarios');
+        const users = await res.json();
+        const ul = document.getElementById('lista-usuarios');
+        ul.innerHTML = '';
+        users.forEach(u => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${u.user}</span>
+                <div class="buttons-list">
+                    <button class="btn-secundario" style="border-radius:20px;" onclick="abrirHistorico(${u.id}, '${u.user}')">Historico</button>
+                    <button class="btn-secundario" style="width:fit-content; border-radius:10px;" onclick="abrirEdicao(${u.id}, '${u.user}')">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                </div>`;
+            ul.appendChild(li);
+        });
+    }
+
+    document.getElementById('add_user').addEventListener('click', () => {
+        document.getElementById('newusername').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('new-confirm-password').value = '';
+        document.getElementById('erro-newuser').style.display = 'none';
+        document.getElementById('popup-newuser').style.display = 'flex';
+    });
+
+    async function salvarNovoUsuario() {
+        const username = document.getElementById('newusername').value.trim();
+        const password = document.getElementById('new-password').value;
+        const confirm  = document.getElementById('new-confirm-password').value;
+        const erro     = document.getElementById('erro-newuser');
+
+        const form = new FormData();
+        form.append('newusername', username);
+        form.append('password', password);
+        form.append('confirm_password', confirm);
+
+        const res  = await fetch('/novo_usuario', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.erro) {
+            erro.textContent = data.erro;
+            erro.style.display = 'block';
+        } else {
+            fecharTodosPopups();
+            carregarUsuarios();
+        }
+    }
+
+    function abrirEdicao(id, username) {
+        document.getElementById('edit-user-id').value   = id;
+        document.getElementById('edit-username').value  = username;
+        document.getElementById('edit-titulo').textContent = `Editar: ${username}`;
+        document.getElementById('edit-newpassword').value = '';
+        document.getElementById('edit-confirm-newpassword').value = '';
+        document.getElementById('erro-edit').style.display = 'none';
+        document.getElementById('popup-edit').style.display = 'flex';
+    }
+
+    async function salvarEdicaoUsuario() {
+        const user_id = document.getElementById('edit-user-id').value;
+        const password = document.getElementById('edit-newpassword').value;
+        const confirm  = document.getElementById('edit-confirm-newpassword').value;
+        const erro     = document.getElementById('erro-edit');
+
+        const form = new FormData();
+        form.append('user_id', user_id);
+        form.append('newpassword', password);
+        form.append('confirm_newpassword', confirm);
+
+        const res  = await fetch('/editar_usuario', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.erro) {
+            erro.textContent = data.erro;
+            erro.style.display = 'block';
+        } else {
+            fecharTodosPopups();
+        }
+    }
+
+    async function excluirUsuario() {
+        const user_id  = document.getElementById('edit-user-id').value;
+        const username = document.getElementById('edit-username').value;
+        if (!confirm(`Excluir o usuário "${username}"? Esta ação não pode ser desfeita.`)) return;
+
+        const form = new FormData();
+        form.append('user_id', user_id);
+        const res  = await fetch('/excluir_usuario', { method: 'POST', body: form });
+        const data = await res.json();
+        if (!data.erro) {
+            fecharTodosPopups();
+            carregarUsuarios();
+        }
+    }
+
+    function abrirHistorico(id, username) {
+        historyUserId = id;
+        document.getElementById('history-titulo').textContent = `Histórico: ${username}`;
+        document.getElementById('select-dias').value = 'hoje';
+        document.querySelector('.history-container').innerHTML = '';
+        document.getElementById('popup-history').style.display = 'flex';
+        carregarHistorico();
+    }
+
+    async function carregarHistorico() {
+        if (!historyUserId) return;
+        const dias = document.getElementById('select-dias').value;
+        const res  = await fetch(`/historico_usuario/${historyUserId}?dias=${dias}`);
+        const rows = await res.json();
+        const container = document.querySelector('.history-container');
+        container.innerHTML = '';
+        if (!rows.length) {
+            container.innerHTML = '<span style="color:#999">Nenhum registro encontrado.</span>';
+            return;
+        }
+        rows.forEach(r => {
+            const span = document.createElement('span');
+            span.style.display = 'block';
+            span.style.padding = '4px 0';
+            span.style.borderBottom = '1px solid #eee';
+            span.textContent = `${r.data_hora} — ${r.acao}`;
+            container.appendChild(span);
+        });
+    }
+
+    // ─── LOGS CADASTRO ──────────────────────────────────────
+
+    let pollInterval = null;
+    let logsVisiveis = [];
+
+    function abrirPopupLogs() { document.getElementById('popup-logs').style.display = 'flex'; }
+
+    function renderizarLogs(logs, status) {
+        const container = document.querySelector('#popup-logs .logs-container');
+        logs.slice(logsVisiveis.length).forEach(msg => {
+            const span = document.createElement('span');
+            span.style.cssText = 'display:block; padding:2px 0;';
+            span.textContent = msg;
+            container.appendChild(span);
+        });
+        logsVisiveis = logs;
+        if (status === 'concluido') {
+            clearInterval(pollInterval);
+            const fim = document.createElement('span');
+            fim.style.cssText = 'display:block; font-weight:bold; margin-top:8px;';
+            fim.textContent = '✔ Processo concluído.';
+            container.appendChild(fim);
+        }
+    }
+
+    document.querySelector('.form-cadastro').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        logsVisiveis = [];
+        document.querySelector('#popup-logs .logs-container').innerHTML = '';
+        abrirPopupLogs();
+        const res  = await fetch('/cadastrarproduto', { method: 'POST', body: new FormData(this) });
+        const data = await res.json();
+        if (data.job_id) {
+            pollInterval = setInterval(async () => {
+                const r = await fetch(`/status_cadastro/${data.job_id}`);
+                const d = await r.json();
+                renderizarLogs(d.logs || [], d.status);
+            }, 1500);
+        }
+    });
+
+    document.getElementById('logs_cadastro').addEventListener('click', e => {
+        e.preventDefault(); abrirPopupLogs();
+    });
+
+    // ─── LOGS VERIFICAR ─────────────────────────────────────
+
+    let pollVerificaInterval = null;
+    let logsVerificaVisiveis = [];
+
+    function abrirPopupLogsVerifica() { document.getElementById('popup-logs-verifica').style.display = 'flex'; }
+
+    function renderizarLogsVerifica(logs, status) {
+        const container = document.querySelector('#popup-logs-verifica .logs-container');
+        logs.slice(logsVerificaVisiveis.length).forEach(msg => {
+            const span = document.createElement('span');
+            span.style.cssText = 'display:block; padding:2px 0;';
+            span.textContent = msg;
+            container.appendChild(span);
+        });
+        logsVerificaVisiveis = logs;
+        if (status === 'concluido') {
+            clearInterval(pollVerificaInterval);
+            const fim = document.createElement('span');
+            fim.style.cssText = 'display:block; font-weight:bold; margin-top:8px;';
+            fim.textContent = '✔ Verificação concluída.';
+            container.appendChild(fim);
+        }
+    }
+
+    document.getElementById('select-verifica').addEventListener('change', function () {
+        document.getElementById('tipo_verifica').value = this.value;
+    });
+
+    document.querySelector('.form-verifica').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        logsVerificaVisiveis = [];
+        document.querySelector('#popup-logs-verifica .logs-container').innerHTML = '';
+        abrirPopupLogsVerifica();
+        const res  = await fetch('/verificaproduto', { method: 'POST', body: new FormData(this) });
+        const data = await res.json();
+        if (data.job_id) {
+            pollVerificaInterval = setInterval(async () => {
+                const r = await fetch(`/status_verifica/${data.job_id}`);
+                const d = await r.json();
+                renderizarLogsVerifica(d.logs || [], d.status);
+            }, 1500);
+        }
+    });
+
+    document.getElementById('logs_verifica').addEventListener('click', e => {
+        e.preventDefault(); abrirPopupLogsVerifica();
+    });
+
+    // ─── INIT ────────────────────────────────────────────────
+    carregarUsuarios();
+</script>
+</body>
+
+</html>

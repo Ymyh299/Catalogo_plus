@@ -74,11 +74,62 @@
         }
 
         header i,
-        header a {
+        header a,
+        header button {
+            background-color: transparent;
+            border: none;
             text-decoration: none;
             color: rgb(60, 60, 60);
             font-size: 25px;
             cursor: pointer;
+        }
+
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+
+        .dropdown-options {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            z-index: 10;
+            min-width: 220px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .dropdown:hover .dropdown-options {
+            display: block;
+        }
+
+        .dropdown-options a {
+            display: block;
+            color: #333333;
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 24px;
+            font-family: 'Agenda', sans-serif;
+            transition: background 0.2s ease;
+            text-align: left;
+        }
+
+        .dropdown-options a:hover {
+            background-color: #f8f8f8;
+            color: #000;
+        }
+
+        .dropdown::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 20px;
         }
 
         /* CONTAINER PRINCIPAL */
@@ -226,7 +277,13 @@
 <body>
     <main>
         <header>
-            <div style="width: 25px;"></div>
+            <div class="dropdown">
+                <button class="fa-solid fa-bars"></button>
+                <div class="dropdown-options">
+                    <a href="/agente">Agentes IA</a>
+                    <a href="/admin">Painel ADM</a>
+                </div>
+            </div>
             <p class="tit">Catálogo+</p>
             <i class="fa-solid fa-right-from-bracket" onclick="window.location.href='/logout'"></i>
         </header>
@@ -238,6 +295,7 @@
 
             <div class="carousel-wrapper" id="carouselWrapper">
                 <div class="carousel" id="carousel">
+                    <img src="/static/layouts/template_diadosnamorados.jpg" alt="Layout 3" data-name="template_diadosnamorados">
                     <img src="/static/layouts/template_produtos.png" alt="Layout 1" data-name="template_produtos">
                     <img src="/static/layouts/template_polaroid.png" alt="Layout 2" data-name="template_polaroid">
                 </div>
